@@ -17,6 +17,6 @@ const server = http.createServer((req, res) => {
     res.end(req.method === 'HEAD' ? undefined : data);
   });
 });
-server.listen(4173, '127.0.0.1', () => console.log('算法拾遗：http://127.0.0.1:4173'));
+server.listen(Number(process.env.PORT || 4173), '127.0.0.1', () => console.log('算法拾遗：http://127.0.0.1:'+server.address().port));
 server.on('error', error => { console.error(error.message); process.exitCode = 1; });
 module.exports = server;

@@ -12,7 +12,7 @@ const path = require('node:path');
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
   const page = await context.newPage(); const errors = [];
   page.on('pageerror', e => errors.push(e.message));
-  const base = 'http://127.0.0.1:4173/';
+  const base = 'http://127.0.0.1:'+server.address().port+'/';
   assert.equal((await page.goto(base)).status(), 200);
   await page.getByRole('heading', { name: '让每一道错题，都成为理解的起点。' }).waitFor();
   await page.locator('.skip').focus();
@@ -142,7 +142,7 @@ const path = require('node:path');
    const state=await bfs.locator('#queue').textContent();
    const progress=await bfs.locator('#counter').textContent();
    for(const lang of ['Java','Python']) {
-    await bfs.locator('#lang').selectOption(lang);
+    await bfs.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await bfs.locator('#queue').textContent(),state);
     assert.equal(await bfs.locator('#counter').textContent(),progress);
     assert.equal(await bfs.locator('.line.on').count(),1);
@@ -158,7 +158,7 @@ const path = require('node:path');
   await bfs.locator('#prev').click();
   assert.ok((await bfs.locator('#counter').textContent()).startsWith('0 /'));
   for(const lang of ['Python','Java']) {
-  await bfs.locator('#lang').selectOption(lang);
+  await bfs.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
   for(const [value,answer] of [['0','1'],['1','7'],['2','42'],['3','9'],['4','3']]) {
    await bfs.locator('#example').selectOption(value);
    await bfs.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
@@ -197,7 +197,7 @@ const path = require('node:path');
    await phone.locator('#seek').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));},i);
    const state=await phone.locator('#slots').textContent();
    for(const lang of ['Java','Python']){
-    await phone.locator('#lang').selectOption(lang);
+    await phone.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await phone.locator('#slots').textContent(),state);
     assert.equal(await phone.locator('#counter').textContent(),`${i} / ${phoneEvents.length-1}`);
     assert.equal(await phone.locator('.line.on').count(),1);
@@ -235,7 +235,7 @@ const path = require('node:path');
   for(let i=0;i<subsetEvents.length;i++){
    await subsets.locator('#seek').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));},i);
    for(const lang of ['Java','Python']){
-    await subsets.locator('#lang').selectOption(lang);
+    await subsets.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await subsets.locator('#slots').textContent(),'path = '+JSON.stringify(subsetEvents[i].path));
     assert.equal(await subsets.locator('#answers').textContent(),'ans = '+JSON.stringify(subsetEvents[i].ans));
     assert.equal(await subsets.locator('#counter').textContent(),i+' / '+(subsetEvents.length-1));
@@ -275,7 +275,7 @@ const path = require('node:path');
    await combo.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
    const state=await combo.locator('#slots').textContent();
    for(const lang of ['Java','Python']){
-    await combo.locator('#lang').selectOption(lang);
+    await combo.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await combo.locator('#slots').textContent(),state);
     assert.equal(await combo.locator('.line.on').count(),1);
     assert.ok((await combo.locator('.line.on').textContent()).endsWith(cs[lang][cl[lang][ct(4,2).events[i].line]]));
@@ -303,7 +303,7 @@ const path = require('node:path');
    await perm.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
    const state=await perm.locator('#slots').textContent();
    for(const lang of ['Java','Python']){
-    await perm.locator('#lang').selectOption(lang);
+    await perm.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await perm.locator('#slots').textContent(),state);
     assert.equal(await perm.locator('#counter').textContent(),i+' / '+(pe.length-1));
     assert.equal(await perm.locator('#answers').textContent(),'ans = '+JSON.stringify(pe[i].ans));
@@ -334,7 +334,7 @@ const path = require('node:path');
   for(let i=0;i<palEvents.length;i++){
    await pal.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
    for(const lang of ['Java','Python']){
-    await pal.locator('#lang').selectOption(lang);
+    await pal.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);
     assert.equal(await pal.locator('#slots').textContent(),'path = '+JSON.stringify(palEvents[i].path));
     assert.equal(await pal.locator('#answers').textContent(),'ans = '+JSON.stringify(palEvents[i].ans));
     assert.equal(await pal.locator('#counter').textContent(),i+' / '+(palEvents.length-1));
@@ -404,7 +404,7 @@ const path = require('node:path');
   await rob.locator('#next').click();const robState=await rob.locator('#frames').textContent();
   await rob.locator('#next').click();await rob.locator('#prev').click();assert.equal(await rob.locator('#frames').textContent(),robState);
   for(const lang of ['Python','Java']){
-   await rob.locator('#lang').selectOption(lang);assert.equal(await rob.locator('#frames').textContent(),robState);
+   await rob.locator('#lang').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('change'));},lang);assert.equal(await rob.locator('#frames').textContent(),robState);
    const max=await rob.locator('#seek').getAttribute('max');
    for(let i=0;i<=Number(max);i++){
     await rob.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},String(i));
@@ -426,6 +426,46 @@ const path = require('node:path');
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await rob.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
    await page.screenshot({path:'test-results/robber-'+width+'.png',fullPage:true});
   }
+  await page.goto(base+'#/problem/leetcode-1143');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const lcs=page.frameLocator('#demo');
+  const {trace:lcsTrace,snippets:lcsCode,highlightLines:lcsLines}=require('./dist/problems/lcs/app.js');
+  const lcsEvents=lcsTrace('abcde','ace').events;
+  for(let i=0;i<lcsEvents.length;i++){
+   await lcs.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
+   const state=await lcs.locator('#array').textContent();
+   for(const lang of ['Java','Python']){
+    await lcs.locator('#lang').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('change'));},lang);
+    assert.equal(await lcs.locator('#array').textContent(),state);
+    assert.equal(await lcs.locator('#counter').textContent(),i+' / '+(lcsEvents.length-1));
+    assert.equal(await lcs.locator('.line.on').count(),1);
+    assert.ok((await lcs.locator('.line.on').textContent()).endsWith(lcsCode[lang][lcsLines[lang][lcsEvents[i].line]]));
+    assert.deepEqual(await lcs.locator('.slot b').allTextContents(),lcsEvents[i].f.map(String));
+   }
+  }
+  for(const [input,expected] of [['["abc","abc"]',3],['["abc","def"]',0],['["a","aa"]',1],['["ab","ba"]',1],['["","abc"]',0]]){
+   await lcs.locator('#example').selectOption(input);
+   await lcs.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+   assert.equal(await lcs.locator('#result').textContent(),'LCS 长度 = '+expected);
+  }
+  await lcs.locator('#example').selectOption('["abcde","ace"]');
+  await lcs.locator('#next').click();const lcsState=await lcs.locator('#array').textContent();
+  await lcs.locator('#next').click();await lcs.locator('#prev').click();assert.equal(await lcs.locator('#array').textContent(),lcsState);
+  await lcs.locator('#reset').click();await lcs.locator('#speed').selectOption('350');await lcs.locator('#play').click();
+  await page.waitForTimeout(800);await lcs.locator('#play').click();const lcsPaused=await lcs.locator('#counter').textContent();assert.ok(!lcsPaused.startsWith('0 /'));
+  await page.waitForTimeout(450);assert.equal(await lcs.locator('#counter').textContent(),lcsPaused);
+  await page.locator('#notes').fill('先保存旧上方到 tmp，再更新，最后 pre=tmp。');await page.reload();
+  assert.equal(await page.locator('#notes').inputValue(),'先保存旧上方到 tmp，再更新，最后 pre=tmp。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await lcs.locator('#seek').evaluate(e=>{e.value=10;e.dispatchEvent(new Event('input'));});
+  for(const width of [1440,390]){
+   await page.setViewportSize({width,height:1000});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   assert.ok(await lcs.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:'test-results/lcs-'+width+'.png',fullPage:true});
+  }
+  await page.goto(base+'#/problem/leetcode-78');assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }

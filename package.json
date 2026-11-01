@@ -4,6 +4,6 @@
   "private": true,
   "scripts": {
     "start": "node serve.cjs",
-    "test": "node check.cjs && node bottom-left-check.cjs && node records-check.cjs && node languages-check.cjs && node phone-check.cjs && node subsets-check.cjs && node combinations-check.cjs && node permutations-check.cjs && node palindrome-check.cjs"
+    "test": "node check.cjs && node bottom-left-check.cjs && node records-check.cjs && node languages-check.cjs && node phone-check.cjs && node subsets-check.cjs && node combinations-check.cjs && node permutations-check.cjs && node palindrome-check.cjs && node sliding-window-check.cjs"
   }
 }

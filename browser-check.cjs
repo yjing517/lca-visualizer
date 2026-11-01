@@ -365,6 +365,39 @@ const path = require('node:path');
   }
   await page.goto(base+'#/problem/leetcode-78');assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
   await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+  await page.goto(base+'#/problem/leetcode-239');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const sw=page.frameLocator('#demo');
+  const {trace:swTrace,examples:swExamples,snippets:swCode,highlightLines:swLines}=require('./dist/problems/sliding-window/app.js');
+  for(let example=0;example<swExamples.length;example++){
+   await sw.locator('#example').selectOption(String(example));
+   const expected=swTrace(swExamples[example].nums,swExamples[example].k).events;
+   const checked=await sw.locator('body').evaluate((body,{expected,swCode,swLines,nums})=>{
+    const $=id=>document.getElementById(id);
+    for(let i=0;i<expected.length;i++){
+     $('seek').value=i;$('seek').dispatchEvent(new Event('input'));
+     for(const lang of ['Python','Java']){
+      $('lang').value=lang;$('lang').dispatchEvent(new Event('change'));
+      if($('counter').textContent!==`${i} / ${expected.length-1}`)throw Error('progress changed');
+      if($('answers').textContent!=='ans = '+JSON.stringify(expected[i].ans))throw Error('answers changed');
+      if(document.querySelectorAll('.line.on').length!==1||!document.querySelector('.line.on').textContent.endsWith(swCode[lang][swLines[lang][expected[i].line]]))throw Error('highlight mismatch');
+      const expectedQueue=expected[i].queue.map(j=>`${j} → 值 ${nums[j]}`).join('');
+      if($('queue').textContent!==(expectedQueue||'∅ 空队列'))throw Error('queue changed');
+     }
+    }
+    return true;
+   },{expected,swCode,swLines,nums:swExamples[example].nums});assert.ok(checked);
+  }
+  await sw.locator('#example').selectOption('0');await sw.locator('#next').click();const swProgress=await sw.locator('#counter').textContent();
+  await sw.locator('#next').click();await sw.locator('#prev').click();assert.equal(await sw.locator('#counter').textContent(),swProgress);
+  await sw.locator('#reset').click();await sw.locator('#speed').selectOption('350');await sw.locator('#play').click();await page.waitForTimeout(800);await sw.locator('#play').click();
+  const swPaused=await sw.locator('#counter').textContent();assert.ok(!swPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await sw.locator('#counter').textContent(),swPaused);
+  await sw.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});assert.equal(await sw.locator('#answers').textContent(),'ans = [3,3,5,5,6,7]');
+  await page.locator('#notes').fill('存下标，队尾淘汰，队头过期。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'存下标，队尾淘汰，队头过期。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await sw.locator('#seek').evaluate(e=>{e.value=30;e.dispatchEvent(new Event('input'));});
+  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await sw.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`test-results/sliding-window-${width}.png`,fullPage:true});}
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }

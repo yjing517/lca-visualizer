@@ -25,7 +25,7 @@ const path = require('node:path');
   await page.locator('#search').fill('236');
   assert.equal(await page.locator('#results .problem').count(), 1);
   await page.locator('#search').fill('递归');
-  assert.equal(await page.locator('#results .problem').count(), 5);
+  assert.equal(await page.locator('#results .problem').count(), 6);
   await page.locator('#search').fill('不存在的题目');
   assert.ok((await page.locator('#results').textContent()).includes('没有找到'));
   await page.locator('#search').fill('');
@@ -324,6 +324,46 @@ const path = require('node:path');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   await perm.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
   for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await perm.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`test-results/permutations-${width}.png`,fullPage:true});}
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+
+  await page.goto(base+'#/problem/leetcode-131');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const pal=page.frameLocator('#demo');
+  const {trace:palTrace,snippets:palCode,highlightLines:palLines}=require('./dist/problems/palindrome/app.js');
+  const palEvents=palTrace('aab').events;
+  for(let i=0;i<palEvents.length;i++){
+   await pal.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
+   for(const lang of ['Java','Python']){
+    await pal.locator('#lang').selectOption(lang);
+    assert.equal(await pal.locator('#slots').textContent(),'path = '+JSON.stringify(palEvents[i].path));
+    assert.equal(await pal.locator('#answers').textContent(),'ans = '+JSON.stringify(palEvents[i].ans));
+    assert.equal(await pal.locator('#counter').textContent(),i+' / '+(palEvents.length-1));
+    assert.equal(await pal.locator('.line.on').count(),1);
+    assert.ok((await pal.locator('.line.on').textContent()).endsWith(palCode[lang][palLines[lang][palEvents[i].line]]));
+   }
+  }
+  for(const v of ['a','aba','aaa','abc']){
+   await pal.locator('#example').selectOption(v);
+   await pal.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+   assert.equal(await pal.locator('#answers').textContent(),'ans = '+JSON.stringify(palTrace(v).events.at(-1).ans));
+  }
+  await pal.locator('#example').selectOption('aab');await pal.locator('#next').click();
+  const palState=await pal.locator('#slots').textContent();await pal.locator('#next').click();await pal.locator('#prev').click();
+  assert.equal(await pal.locator('#slots').textContent(),palState);
+  await pal.locator('#reset').click();await pal.locator('#speed').selectOption('350');await pal.locator('#play').click();
+  await page.waitForTimeout(800);await pal.locator('#play').click();const palPaused=await pal.locator('#counter').textContent();
+  assert.ok(!palPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await pal.locator('#counter').textContent(),palPaused);
+  await page.locator('#notes').fill('下一段从 j+1 开始，非回文继续枚举，不是 break。');await page.reload();
+  assert.equal(await page.locator('#notes').inputValue(),'下一段从 j+1 开始，非回文继续枚举，不是 break。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await pal.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+  for(const width of [1440,390]){
+   await page.setViewportSize({width,height:1000});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   assert.ok(await pal.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:'test-results/palindrome-'+width+'.png',fullPage:true});
+  }
+  await page.goto(base+'#/problem/leetcode-78');assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
   await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');

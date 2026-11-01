@@ -126,4 +126,18 @@ window.PROBLEMS = [{
     "固定数组无需 pop，但必须复制保存答案；数字互不相同是使用 set 的前提。"
   ],
   "complexity": "时间 O(n·n!)；递归栈与固定路径 O(n)，各层新建集合合计辅助空间 O(n²)，结果空间 O(n·n!)。"
+}, {
+  id: 'leetcode-131', number: '131', title: '分割回文串', difficulty: '中等',
+  category: '回溯', tags: ['递归', 'DFS', '字符串', '剪枝'], addedAt: '2026-11-01',
+  source: 'https://leetcode.cn/problems/palindrome-partitioning/',
+  summary: '从选子集到选切割点：枚举下一段终点，回文才递归，下一段从 j+1 开始。',
+  statement: '给定字符串 s，将它分割成若干连续子串，使每段都是回文串，返回所有分割方案。回文串正读反读相同。示例 aab → [["a","a","b"],["aa","b"]]；a → [["a"]]。原题 1 ≤ s.length ≤ 16，且仅含小写英文字母。',
+  demo: 'problems/palindrome/index.html',
+  principles: [
+    { title: '子集的选择对象变成字符间隙', text: '每个间隙可切或不切，但最后每段都必须回文。循环 j 从 i 到 n-1，直接枚举下一段 s[i:j+1]；循环的每一轮都是一个不同分支，无需再写两个显式 dfs。' },
+    { title: 'dfs(i) 处理尚未分割的后缀', text: '进入调用时，path 是 s[0:i] 的合法回文分割。选中覆盖 i 到 j 的一段后，下一段从 j+1 开始，所以递归 dfs(j+1)，不能固定写 i+1。i==n 时整个字符串恰好覆盖，保存方案。' },
+    { title: '回文过滤与选择撤销', text: 't[::-1] 是反转串，相等才 append(t)、递归、pop。非回文只跳过当前候选，不能 break，因为更长的段可能回文。叶子处 copy 独立保存列表，之后 pop 不会改变答案。' }
+  ],
+  pitfalls: ['切片 s[i:j+1] 包含 j，因为右端不包含；Java substring 也一样。', '选 aa 后从下标 2 继续，不能从 1 开始重复字符。每段必须连续且所有段拼回原字符串。', '单字符始终回文；ab 不回文不代表 aba 不回文。', '和子集题一样，return 只返回上一层，父层仍要 pop 并继续循环；只有 i==n 才收集完整方案。'],
+  complexity: '截图逐段切片、反转判断版本：最坏时间 O(n·2ⁿ)，不含结果的辅助空间 O(n)。当前递归链上的已选字符串覆盖互不重叠的前缀，总长度不超过 n。结果空间 O(n·2ⁿ)。'
 }];

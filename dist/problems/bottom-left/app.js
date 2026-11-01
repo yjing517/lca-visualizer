@@ -24,7 +24,7 @@ function trace(values) {
  while(head<queue.length) {
   emit(3,'q 非空，进入下一轮；node 暂时保留上一轮的值。','检查循环');
   node=queue[head++]; visited.push(node.id);
-  emit(4,`q.popleft()：从队头取出 ${node.val}，赋给 node。它已离开队列。`,'队头出队');
+  emit(4,`从队头取出 ${node.val}，赋给 node。Python 用 q.popleft()，Java 用 q.removeFirst()。它已离开队列。`,'队头出队');
   if(node.right) queue.push(node.right);
   emit(5,node.right?`先把右孩子 ${node.right.val} 加入队尾。`:`节点 ${node.val} 没有右孩子，不入队。`,'检查右孩子');
   if(node.left) queue.push(node.left);
@@ -34,18 +34,45 @@ function trace(values) {
  emit(7,`返回 node.val = ${node.val}：最深一层从右到左访问，最后留下最左节点。`,'找到答案',node.id);
  return {nodes,events};
 }
-if(typeof module!=='undefined') module.exports={trace,buildTree,examples};
+const snippets={Python:[
+ 'from collections import deque',
+ 'def findBottomLeftValue(self, root):',
+ '    q = deque([root])',
+ '    while q:',
+ '        node = q.popleft()',
+ '        if node.right: q.append(node.right)',
+ '        if node.left: q.append(node.left)',
+ '    return node.val'
+],Java:[
+ 'import java.util.ArrayDeque;',
+ 'import java.util.Deque;',
+ 'class Solution {',
+ '    public int findBottomLeftValue(TreeNode root) {',
+ '        Deque<TreeNode> q = new ArrayDeque<>();',
+ '        q.addLast(root);',
+ '        TreeNode node = null;',
+ '        while (!q.isEmpty()) {',
+ '            node = q.removeFirst();',
+ '            if (node.right != null) q.addLast(node.right);',
+ '            if (node.left != null) q.addLast(node.left);',
+ '        }',
+ '        return node.val;',
+ '    }',
+ '}'
+]};
+const highlightLines={Python:{2:2,3:3,4:4,5:5,6:6,7:7},Java:{2:5,3:7,4:8,5:9,6:10,7:12}};
+if(typeof module!=='undefined') module.exports={trace,buildTree,examples,snippets,highlightLines};
 if(typeof document!=='undefined') {
- const lines=['from collections import deque','def findBottomLeftValue(self, root):','    q = deque([root])','    while q:','        node = q.popleft()','        if node.right: q.append(node.right)','        if node.left: q.append(node.left)','    return node.val'];
  const $=id=>document.getElementById(id); let data,index=0,timer=null;
  function stop(){clearInterval(timer);timer=null;$('play').textContent='▶ 自动播放';}
  function render(){
   const e=data.events[index],byId=id=>data.nodes[id],label=id=>`${byId(id).val} (#${id})`;
   $('tree').innerHTML=data.nodes.map(n=>['left','right'].filter(s=>n[s]).map(s=>`<line class="edge" x1="${n.x}" y1="${40+n.depth*75}" x2="${n[s].x}" y2="${40+n[s].depth*75}"/>`).join('')).join('')+data.nodes.map(n=>`<g class="node ${e.queue.includes(n.id)?'target':''} ${e.node===n.id?'active':''} ${e.answer===n.id?'answer':''}" transform="translate(${n.x},${40+n.depth*75})"><circle r="23"/><text>${n.val}</text><text class="bubble" y="-31">#${n.id}</text></g>`).join('');
-  $('code').replaceChildren(...lines.map((line,i)=>{const el=document.createElement('div');el.className='line'+(e.line===i?' on':'');const num=document.createElement('span');num.className='num';num.textContent=i+1;el.append(num,document.createTextNode(line));return el;}));
+  const lang=$('lang').value,lines=snippets[lang],highlight=highlightLines[lang][e.line];
+  $('code').replaceChildren(...lines.map((line,i)=>{const el=document.createElement('div');el.className='line'+(highlight===i?' on':'');const num=document.createElement('span');num.className='num';num.textContent=i+1;el.append(num,document.createTextNode(line));return el;}));
   $('queue').replaceChildren(...(e.queue.length?e.queue.map(id=>{const el=document.createElement('span');el.className='frame';el.textContent=label(id);return el;}):[document.createTextNode('∅ 空队列')]));
   $('visited').textContent='出队顺序：'+(e.visited.map(id=>byId(id).val).join(' → ')||'尚未出队');
-  $('current').textContent='node = '+(e.node===null?'尚未赋值':label(e.node));
+  $('current').textContent='node = '+(e.node===null?(lang==='Java'?'null（尚未出队）':'尚未赋值'):label(e.node));
   $('phase').textContent=e.phase;$('message').textContent=e.message;
   $('result').textContent=e.answer!==null?`答案 = ${byId(e.answer).val}`:`已出队 ${e.visited.length} / ${data.nodes.length}`;
   $('counter').textContent=`${index} / ${data.events.length-1}`;$('seek').value=index;
@@ -54,7 +81,7 @@ if(typeof document!=='undefined') {
  function reset(){stop();data=trace(examples[+$('example').value]);index=0;$('seek').max=data.events.length-1;render();}
  function step(delta){index=Math.max(0,Math.min(data.events.length-1,index+delta));render();if(index===data.events.length-1)stop();}
  $('next').onclick=()=>{stop();step(1)};$('prev').onclick=()=>{stop();step(-1)};$('reset').onclick=reset;
- $('seek').oninput=()=>{stop();index=+$('seek').value;render()};$('example').onchange=reset;
+ $('seek').oninput=()=>{stop();index=+$('seek').value;render()};$('example').onchange=reset;$('lang').onchange=render;
  $('play').onclick=()=>{if(timer)return stop();if(index===data.events.length-1)index=0;$('play').textContent='Ⅱ 暂停';render();timer=setInterval(()=>step(1),+$('speed').value)};
  $('speed').onchange=()=>{if(timer){stop();$('play').click()}};
  reset();

@@ -43,6 +43,14 @@ const path = require('node:path');
   assert.ok((await demo.locator('#counter').textContent()).startsWith('0 /'));
   await demo.locator('#lang').selectOption('Python');
   assert.ok((await demo.locator('#code').textContent()).includes('def lowestCommonAncestor'));
+  await demo.locator('#next').click();
+  const lcaProgress=await demo.locator('#counter').textContent();
+  const lcaFrames=await demo.locator('#frames').textContent();
+  await demo.locator('#lang').selectOption('Java');
+  assert.ok((await demo.locator('#code').textContent()).includes('TreeNode lca'));
+  assert.equal(await demo.locator('#counter').textContent(),lcaProgress);
+  assert.equal(await demo.locator('#frames').textContent(),lcaFrames);
+  assert.equal(await demo.locator('.line.on').count(),1);
   await demo.locator('#example').selectOption('5,4');
   await demo.locator('#seek').evaluate(e => { e.value = e.max; e.dispatchEvent(new Event('input')); });
   assert.equal(await demo.locator('#result').textContent(), 'LCA = 5');
@@ -127,6 +135,21 @@ const path = require('node:path');
   await page.goto(base + '#/problem/leetcode-513');
   await page.waitForFunction(() => document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const bfs=page.frameLocator('#demo');
+  const {trace:traceBfs,examples:bfsExamples,snippets,highlightLines}=require('./dist/problems/bottom-left/app.js');
+  const bfsEvents=traceBfs(bfsExamples[1]).events;
+  for(let i=1;i<bfsEvents.length;i++) {
+   await bfs.locator('#seek').evaluate((e,value)=>{e.value=value;e.dispatchEvent(new Event('input'));},i);
+   const state=await bfs.locator('#queue').textContent();
+   const progress=await bfs.locator('#counter').textContent();
+   for(const lang of ['Java','Python']) {
+    await bfs.locator('#lang').selectOption(lang);
+    assert.equal(await bfs.locator('#queue').textContent(),state);
+    assert.equal(await bfs.locator('#counter').textContent(),progress);
+    assert.equal(await bfs.locator('.line.on').count(),1);
+    assert.ok((await bfs.locator('.line.on').textContent()).endsWith(snippets[lang][highlightLines[lang][bfsEvents[i].line]]));
+   }
+  }
+  await bfs.locator('#reset').click();
   await bfs.locator('#next').click();
   assert.equal(await bfs.locator('.line.on').count(),1);
   const queueSnapshot=await bfs.locator('#queue').textContent();
@@ -134,11 +157,14 @@ const path = require('node:path');
   assert.equal(await bfs.locator('#queue').textContent(),queueSnapshot);
   await bfs.locator('#prev').click();
   assert.ok((await bfs.locator('#counter').textContent()).startsWith('0 /'));
+  for(const lang of ['Python','Java']) {
+  await bfs.locator('#lang').selectOption(lang);
   for(const [value,answer] of [['0','1'],['1','7'],['2','42'],['3','9'],['4','3']]) {
    await bfs.locator('#example').selectOption(value);
    await bfs.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
    assert.equal(await bfs.locator('#result').textContent(),'答案 = '+answer);
    assert.ok((await bfs.locator('.line.on').textContent()).includes('return node.val'));
+  }
   }
   await bfs.locator('#example').selectOption('1');
   await bfs.locator('#speed').selectOption('350');await bfs.locator('#play').click();
@@ -162,6 +188,6 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-236');
   assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
-  console.log('Passed: desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
+  console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });

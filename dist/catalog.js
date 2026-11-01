@@ -27,4 +27,18 @@ window.PROBLEMS = [{
   ],
   pitfalls: ['左右指的是树上位置，不是数值大小；不要寻找最小值。', '若改成先左后右入队，最后访问的是最底层最右节点；普通层序解法要记录每层第一个节点。', '队列为空时退出循环，不会再执行 popleft()。单节点树直接返回根值；原题不接收空树。'],
   complexity: '时间 O(n)：每个节点入队、出队各一次。额外空间 O(w)：w 为最大层宽，最坏 O(n)。deque 的 popleft() 为 O(1)，无需像列表 pop(0) 那样搬移元素。'
+}, {
+  id: 'leetcode-17', number: '17', title: '电话号码的字母组合', difficulty: '中等',
+  category: '回溯', tags: ['递归', 'DFS', '字符串'], addedAt: '2026-11-01',
+  source: 'https://leetcode.cn/problems/letter-combinations-of-a-phone-number/',
+  summary: '递归每次填一个格子：看清 return 回到哪里，以及固定数组为什么无需撤销。',
+  statement: '给定仅包含数字 2—9 的字符串 digits，返回所有可能的字母组合，顺序任意。映射为 2:abc、3:def、4:ghi、5:jkl、6:mno、7:pqrs、8:tuv、9:wxyz。示例：23 → [ad,ae,af,bd,be,bf,cd,ce,cf]；空字符串 → []；2 → [a,b,c]。',
+  demo: 'problems/phone/index.html',
+  principles: [
+    { title: 'dfs(i) 只负责第 i 个位置', text: '前 i 个位置已经确定。循环遍历 digits[i] 对应的字母，写入 path[i]，再调用 dfs(i+1) 处理下一位。i == n 时已经填满，先保存再返回。' },
+    { title: '返回上一层，继续尚未结束的循环', text: 'dfs(2) 保存 ad 后返回 dfs(1)，后者继续选 e、f。整个 a 分支完成后，dfs(1) 返回 dfs(0)，第一位才改选 b。' },
+    { title: '固定数组通过覆盖实现回溯', text: 'path 长度固定为 n，不用 append/pop；下一次 path[i] = c 覆盖原值。收集答案前，每格都会由相应层重新填写。join(path) 或 new String(path) 保存独立字符串，不会被后续修改影响。' }
+  ],
+  pitfalls: ['i 是位置下标，不是数字本身；digits[i] 是字符，需要转换后查询映射。', 'return 只结束当前调用；for 循环完成后也会自然返回上一层。', '切换第一位时，后面可能还留着旧字母；填满之前不会收集。空字符串应返回 []，不是包含空字符串的数组。'],
+  complexity: '设 n 为输入长度，K 为组合总数。时间 O(nK)，其中拼接每个答案需 O(n)；递归栈与 path 的额外空间 O(n)，结果占 O(nK)。K 最多为 4ⁿ。'
 }];

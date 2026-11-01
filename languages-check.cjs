@@ -17,7 +17,7 @@ for(const problem of sandbox.window.PROBLEMS) {
   assert.ok(options.includes(lang),`${problem.id}: 缺少 ${lang} 选项`);
   assert.ok(Array.isArray(snippets[lang])&&snippets[lang].length>0,`${problem.id}: 缺少 ${lang} 实现`);
   assert.ok(snippets[lang].every(line=>typeof line==='string'),`${problem.id}: ${lang} 代码行无效`);
-  assert.match(snippets[lang].join('\n'),lang==='Python'?/def \w+\(/:/\b(?:int|TreeNode) \w+\(/,`${problem.id}: ${lang} 必须包含算法方法`);
+  assert.match(snippets[lang].join('\n'),lang==='Python'?/def \w+\(/:/\b(?:int|TreeNode|List<String>) \w+\(/,`${problem.id}: ${lang} 必须包含算法方法`);
   assert.match(snippets[lang].join('\n'),/\breturn\b/,`${problem.id}: ${lang} 必须返回结果`);
  }
 }

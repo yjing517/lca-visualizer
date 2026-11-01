@@ -25,7 +25,7 @@ const path = require('node:path');
   await page.locator('#search').fill('236');
   assert.equal(await page.locator('#results .problem').count(), 1);
   await page.locator('#search').fill('递归');
-  assert.equal(await page.locator('#results .problem').count(), 1);
+  assert.equal(await page.locator('#results .problem').count(), 2);
   await page.locator('#search').fill('不存在的题目');
   assert.ok((await page.locator('#results').textContent()).includes('没有找到'));
   await page.locator('#search').fill('');
@@ -80,7 +80,7 @@ const path = require('node:path');
   await page.screenshot({ path: 'test-results/detail-desktop.png', fullPage: true });
   await page.locator('nav').getByText('学习首页').click();
   assert.ok((await page.locator('.continue').textContent()).includes('继续学习'));
-  assert.equal(await page.locator('.cards .problem').count(), 3);
+  assert.equal(await page.locator('.cards .problem').count(), 4);
   await page.goBack();
   await page.locator('#notes').waitFor();
   await page.goForward();
@@ -187,6 +187,45 @@ const path = require('node:path');
   await page.screenshot({path:'test-results/bottom-left-mobile.png',fullPage:true});
   await page.goto(base+'#/problem/leetcode-236');
   assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+  await page.goto(base+'#/problem/leetcode-17');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const phone=page.frameLocator('#demo');
+  const {trace:phoneTrace,snippets:phoneCode,highlightLines:phoneLines}=require('./dist/problems/phone/app.js');
+  await page.setViewportSize({width:1440,height:1000});
+  const phoneEvents=phoneTrace('23').events;
+  for(let i=0;i<phoneEvents.length;i++){
+   await phone.locator('#seek').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));},i);
+   const state=await phone.locator('#slots').textContent();
+   for(const lang of ['Java','Python']){
+    await phone.locator('#lang').selectOption(lang);
+    assert.equal(await phone.locator('#slots').textContent(),state);
+    assert.equal(await phone.locator('#counter').textContent(),`${i} / ${phoneEvents.length-1}`);
+    assert.equal(await phone.locator('.line.on').count(),1);
+    assert.ok((await phone.locator('.line.on').textContent()).endsWith(phoneCode[lang][phoneLines[lang][phoneEvents[i].line]]));
+   }
+  }
+  for(const value of ['','2','79','222']){
+   await phone.locator('#example').selectOption(value);
+   await phone.locator('#seek').evaluate(el=>{el.value=el.max;el.dispatchEvent(new Event('input'));});
+   assert.equal(await phone.locator('#answers').textContent(),'ans = '+JSON.stringify(phoneTrace(value).events.at(-1).ans));
+  }
+  await phone.locator('#example').selectOption('23');
+  await phone.locator('#next').click();const phoneState=await phone.locator('#slots').textContent();
+  await phone.locator('#next').click();await phone.locator('#prev').click();assert.equal(await phone.locator('#slots').textContent(),phoneState);
+  await phone.locator('#reset').click();await phone.locator('#speed').selectOption('350');await phone.locator('#play').click();
+  await page.waitForTimeout(800);await phone.locator('#play').click();
+  const phonePaused=await phone.locator('#counter').textContent();assert.ok(!phonePaused.startsWith('0 /'));
+  await page.waitForTimeout(450);assert.equal(await phone.locator('#counter').textContent(),phonePaused);
+  await page.locator('#notes').fill('固定格子覆盖，不需要 pop。');await page.reload();
+  assert.equal(await page.locator('#notes').inputValue(),'固定格子覆盖，不需要 pop。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await page.screenshot({path:'test-results/phone-desktop.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  assert.ok(await phone.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+  await page.screenshot({path:'test-results/phone-mobile.png',fullPage:true});
+  await page.goto(base+'#/problem/leetcode-513');assert.equal(await page.locator('#notes').inputValue(),'先右后左，最后出队是左下角。');
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }

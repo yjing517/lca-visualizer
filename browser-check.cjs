@@ -25,7 +25,7 @@ const path = require('node:path');
   await page.locator('#search').fill('236');
   assert.equal(await page.locator('#results .problem').count(), 1);
   await page.locator('#search').fill('递归');
-  assert.equal(await page.locator('#results .problem').count(), 2);
+  assert.equal(await page.locator('#results .problem').count(), 4);
   await page.locator('#search').fill('不存在的题目');
   assert.ok((await page.locator('#results').textContent()).includes('没有找到'));
   await page.locator('#search').fill('');
@@ -80,7 +80,7 @@ const path = require('node:path');
   await page.screenshot({ path: 'test-results/detail-desktop.png', fullPage: true });
   await page.locator('nav').getByText('学习首页').click();
   assert.ok((await page.locator('.continue').textContent()).includes('继续学习'));
-  assert.equal(await page.locator('.cards .problem').count(), 4);
+  assert.equal(await page.locator('.cards .problem').count(), 6);
   await page.goBack();
   await page.locator('#notes').waitFor();
   await page.goForward();
@@ -226,7 +226,76 @@ const path = require('node:path');
   await page.screenshot({path:'test-results/phone-mobile.png',fullPage:true});
   await page.goto(base+'#/problem/leetcode-513');assert.equal(await page.locator('#notes').inputValue(),'先右后左，最后出队是左下角。');
   await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+
+  await page.goto(base+'#/problem/leetcode-78');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const subsets=page.frameLocator('#demo');
+  const {trace:subsetTrace,snippets:subsetCode,highlightLines:subsetLines}=require('./dist/problems/subsets/app.js');
+  const subsetEvents=subsetTrace([1,2,3]).events;
+  for(let i=0;i<subsetEvents.length;i++){
+   await subsets.locator('#seek').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));},i);
+   for(const lang of ['Java','Python']){
+    await subsets.locator('#lang').selectOption(lang);
+    assert.equal(await subsets.locator('#slots').textContent(),'path = '+JSON.stringify(subsetEvents[i].path));
+    assert.equal(await subsets.locator('#answers').textContent(),'ans = '+JSON.stringify(subsetEvents[i].ans));
+    assert.equal(await subsets.locator('#counter').textContent(),i+' / '+(subsetEvents.length-1));
+    assert.equal(await subsets.locator('.line.on').count(),1);
+    assert.ok((await subsets.locator('.line.on').textContent()).endsWith(subsetCode[lang][subsetLines[lang][subsetEvents[i].line]]));
+   }
+  }
+  assert.ok((await subsets.locator('#alias').textContent()).includes('8 项'));
+  for(const input of ['[1,2]','[0]','[-1,2]','[]']){
+   await subsets.locator('#example').selectOption(input);
+   await subsets.locator('#seek').evaluate(el=>{el.value=el.max;el.dispatchEvent(new Event('input'));});
+   assert.equal(await subsets.locator('#answers').textContent(),'ans = '+JSON.stringify(subsetTrace(JSON.parse(input)).events.at(-1).ans));
+  }
+  await subsets.locator('#example').selectOption('[1,2,3]');
+  await subsets.locator('#next').click();const subsetState=await subsets.locator('#slots').textContent();
+  await subsets.locator('#next').click();await subsets.locator('#prev').click();assert.equal(await subsets.locator('#slots').textContent(),subsetState);
+  await subsets.locator('#reset').click();await subsets.locator('#speed').selectOption('350');await subsets.locator('#play').click();
+  await page.waitForTimeout(800);await subsets.locator('#play').click();const subsetPaused=await subsets.locator('#counter').textContent();
+  assert.ok(!subsetPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await subsets.locator('#counter').textContent(),subsetPaused);
+  await page.locator('#notes').fill('copy 保存，pop 撤销，两次递归分别选与不选。');await page.reload();
+  assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await subsets.locator('#seek').evaluate(el=>{el.value=el.max;el.dispatchEvent(new Event('input'));});
+  for(const [name,width,height] of [['desktop',1440,1000],['mobile',390,844]]){
+   await page.setViewportSize({width,height});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   assert.ok(await subsets.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+   await page.screenshot({path:'test-results/subsets-'+name+'.png',fullPage:true});
+  }
+  await page.goto(base+'#/problem/leetcode-17');assert.equal(await page.locator('#notes').inputValue(),'固定格子覆盖，不需要 pop。');
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+  await page.goto(base+'#/problem/leetcode-77');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const combo=page.frameLocator('#demo');
+  const {trace:ct,snippets:cs,highlightLines:cl}=require('./dist/problems/combinations/app.js');
+  for(let i=0;i<ct(4,2).events.length;i++){
+   await combo.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
+   const state=await combo.locator('#slots').textContent();
+   for(const lang of ['Java','Python']){
+    await combo.locator('#lang').selectOption(lang);
+    assert.equal(await combo.locator('#slots').textContent(),state);
+    assert.equal(await combo.locator('.line.on').count(),1);
+    assert.ok((await combo.locator('.line.on').textContent()).endsWith(cs[lang][cl[lang][ct(4,2).events[i].line]]));
+   }
+  }
+  for(const v of ['1,1','4,4','4,1','5,3']){
+   await combo.locator('#example').selectOption(v);
+   await combo.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+   assert.equal(await combo.locator('#answers').textContent(),'ans = '+JSON.stringify(ct(...v.split(',').map(Number)).events.at(-1).ans));
+  }
+  await combo.locator('#reset').click();await combo.locator('#next').click();const cp=await combo.locator('#counter').textContent();
+  await combo.locator('#next').click();await combo.locator('#prev').click();assert.equal(await combo.locator('#counter').textContent(),cp);
+  await combo.locator('#speed').selectOption('350');await combo.locator('#play').click();await page.waitForTimeout(800);await combo.locator('#play').click();
+  const pausedC=await combo.locator('#counter').textContent();assert.notEqual(pausedC,cp);await page.waitForTimeout(450);assert.equal(await combo.locator('#counter').textContent(),pausedC);
+  await page.locator('#notes').fill('j 至少为 d。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'j 至少为 d。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await combo.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`test-results/combinations-${width}.png`,fullPage:true});}
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; });
+

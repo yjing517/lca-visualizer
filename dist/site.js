@@ -8,7 +8,7 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const href = p => `#/problem/${encodeURIComponent(p.id)}`;
   const categories = [...new Set(problems.map(p => p.category))];
-  let demoTimer, demoReady = false;
+  let demoTimer, demoReady = false, viewToken = 0;
   function notice(message) { $('notice').textContent = message; $('notice').hidden = false; }
   function tags(p) { return `<div class="tags">${[p.category, ...p.tags].map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>`; }
   function card(p) {
@@ -77,6 +77,7 @@
     }
   });
   function backup() {
+    const currentView = viewToken;
     $('content').innerHTML = heading('KEEP YOUR THINKING SAFE', '把自己的理解，好好保存。', '导出笔记与掌握程度。以后换个浏览器，也能接着复习。') +
       `<section class="panel backupbox"><h2>导出个人记录</h2><p>包含所有题目的笔记、掌握程度和待复习标记。题目与动画由网站维护，不需要放进个人备份。</p><div class="actions"><button id="export" class="primary">↓ 下载备份文件</button></div></section>
       <section class="panel backupbox"><h2>从备份恢复</h2><p>先选择本网站导出的 JSON 文件，通过检查后再确认导入。备份中同一道题的记录会覆盖当前记录；其他题目的记录保留。</p><div class="actions"><label class="field">选择备份文件<input class="fileinput" type="file" accept=".json,application/json" id="importFile"></label></div><div id="importPreview" class="backupstatus" role="status" aria-live="polite"></div><div class="actions"><button id="confirmImport" class="primary" hidden>确认覆盖并导入</button><button id="cancelImport" hidden>取消</button></div></section>
@@ -96,7 +97,7 @@
       try {
         if (file.size > 2 * 1024 * 1024) throw Error('文件过大，请选择不超过 2 MB 的备份');
         const records = validateBackup(JSON.parse(await file.text()));
-        if (token !== selection || !$('importPreview')) return;
+        if (token !== selection || currentView !== viewToken || !$('importPreview')) return;
         const ids = Object.keys(records); if (!ids.length) throw Error('备份中没有可导入的记录');
         pending = records;
         const overlaps = ids.filter(id => Object.hasOwn(store.records, id)).length;
@@ -104,7 +105,7 @@
         $('importPreview').textContent = `检查通过：${ids.length} 条记录，其中 ${overlaps} 条将覆盖已有记录。${unknown ? `含 ${unknown} 条当前题库未收录的记录，将保留以便以后使用。` : ''}确认后才会写入。`;
         $('confirmImport').hidden = $('cancelImport').hidden = false;
       } catch (error) {
-        if (token !== selection || !$('importPreview')) return;
+        if (token !== selection || currentView !== viewToken || !$('importPreview')) return;
         resetPending(); $('importPreview').classList.add('danger'); $('importPreview').textContent = `无法导入：${error instanceof SyntaxError ? '文件不是有效的 JSON 备份' : error.message}。当前记录未改动。`;
       }
     };
@@ -118,6 +119,7 @@
     };
   }
   function route() {
+    ++viewToken;
     clearTimeout(demoTimer);
     const [path, query = ''] = (location.hash.slice(1) || '/home').split('?');
     const page = path.split('/')[1], params = new URLSearchParams(query);
@@ -135,6 +137,7 @@
     window.scrollTo(0, 0); $('content').focus({ preventScroll: true });
   }
   $('total').textContent = problems.length;
+  document.querySelector('.skip').onclick = event => { event.preventDefault(); $('content').focus(); $('content').scrollIntoView(); };
   $('categories').innerHTML = categories.map(c => `<a class="category" data-category="${esc(c)}" href="#/library?category=${encodeURIComponent(c)}">${esc(c)}<span>${problems.filter(p => p.category === c).length}</span></a>`).join('');
   window.addEventListener('hashchange', route); route();
 })();

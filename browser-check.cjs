@@ -25,7 +25,7 @@ const path = require('node:path');
   await page.locator('#search').fill('236');
   assert.equal(await page.locator('#results .problem').count(), 1);
   await page.locator('#search').fill('递归');
-  assert.equal(await page.locator('#results .problem').count(), 4);
+  assert.equal(await page.locator('#results .problem').count(), 5);
   await page.locator('#search').fill('不存在的题目');
   assert.ok((await page.locator('#results').textContent()).includes('没有找到'));
   await page.locator('#search').fill('');
@@ -80,7 +80,7 @@ const path = require('node:path');
   await page.screenshot({ path: 'test-results/detail-desktop.png', fullPage: true });
   await page.locator('nav').getByText('学习首页').click();
   assert.ok((await page.locator('.continue').textContent()).includes('继续学习'));
-  assert.equal(await page.locator('.cards .problem').count(), 6);
+  assert.equal(await page.locator('.cards .problem').count(), 7);
   await page.goBack();
   await page.locator('#notes').waitFor();
   await page.goForward();
@@ -293,6 +293,37 @@ const path = require('node:path');
   await page.locator('#notes').fill('j 至少为 d。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'j 至少为 d。');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await combo.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`test-results/combinations-${width}.png`,fullPage:true});}
+  await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+  await page.goto(base+'#/problem/leetcode-46');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const perm=page.frameLocator('#demo');
+  const {trace:pt,snippets:ps,highlightLines:pl}=require('./dist/problems/permutations/app.js');
+  const pe=pt([1,2,3]).events;
+  for(let i=0;i<pe.length;i++){
+   await perm.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
+   const state=await perm.locator('#slots').textContent();
+   for(const lang of ['Java','Python']){
+    await perm.locator('#lang').selectOption(lang);
+    assert.equal(await perm.locator('#slots').textContent(),state);
+    assert.equal(await perm.locator('#counter').textContent(),i+' / '+(pe.length-1));
+    assert.equal(await perm.locator('#answers').textContent(),'ans = '+JSON.stringify(pe[i].ans));
+    assert.equal(await perm.locator('.line.on').count(),1);
+    assert.ok((await perm.locator('.line.on').textContent()).endsWith(ps[lang][pl[lang][pe[i].line]]));
+   }
+  }
+  for(const v of ['[0,1]','[1]','[-1,0,2]','[3,1,2]']){
+   await perm.locator('#example').selectOption(v);
+   await perm.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+   assert.equal(await perm.locator('#answers').textContent(),'ans = '+JSON.stringify(pt(JSON.parse(v)).events.at(-1).ans));
+  }
+  await perm.locator('#reset').click();await perm.locator('#next').click();const pp=await perm.locator('#slots').textContent();
+  await perm.locator('#next').click();await perm.locator('#prev').click();assert.equal(await perm.locator('#slots').textContent(),pp);
+  await perm.locator('#speed').selectOption('350');await perm.locator('#play').click();await page.waitForTimeout(800);await perm.locator('#play').click();
+  const pausedP=await perm.locator('#counter').textContent();assert.ok(!pausedP.startsWith('1 /'));await page.waitForTimeout(450);assert.equal(await perm.locator('#counter').textContent(),pausedP);
+  await page.locator('#notes').fill('新集合不用恢复，固定格子覆盖，答案要复制。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'新集合不用恢复，固定格子覆盖，答案要复制。');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await perm.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
+  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await perm.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:`test-results/permutations-${width}.png`,fullPage:true});}
   await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');

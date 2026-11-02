@@ -466,6 +466,28 @@ const path = require('node:path');
   }
   await page.goto(base+'#/problem/leetcode-78');assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
   await page.goto(base+'#/problem/leetcode-236');assert.equal(await page.locator('#notes').inputValue(),'已恢复的备份');
+  await page.goto(base+'#/problem/leetcode-300');
+  await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  const lis=page.frameLocator('#demo');
+  await lis.locator('#next').click();const lisState=await lis.locator('#state').textContent();await lis.locator('#next').click();await lis.locator('#prev').click();assert.equal(await lis.locator('#state').textContent(),lisState);
+  for(const lang of ['Python','Java']){
+   await lis.locator('#lang').selectOption(lang);assert.equal(await lis.locator('#state').textContent(),lisState);
+   assert.ok(await lis.locator('body').evaluate(()=>{const seek=document.getElementById('seek');for(let i=0;i<=Number(seek.max);i++){seek.value=i;seek.dispatchEvent(new Event('input'));if(document.querySelectorAll('.line.on').length!==1)return false;}return true;}));
+   await lis.locator('#seek').evaluate(e=>{e.value=1;e.dispatchEvent(new Event('input'));});
+  }
+  for(const mode of ['strict','screenshot']){
+   await lis.locator('#mode').selectOption(mode);
+   for(const lang of ['Python','Java']){
+    await lis.locator('#lang').selectOption(lang);
+    for(const [input,expected] of [['[10,9,2,5,3,7,101,18]',4],['[0,1,0,3,2,3]',mode==='strict'?4:4],['[7,7,7,7,7,7,7]',mode==='strict'?1:7],['[3,5,6,2,4]',3],['[5,4,3,2,1]',1],['[-2,-1,0]',3],['[1]',1],['[]',0]]){
+     await lis.locator('#example').selectOption(input);await lis.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});assert.ok((await lis.locator('#answers').textContent()).startsWith('当前长度：'+expected+'（'));
+    }
+   }
+  }
+  await lis.locator('#mode').selectOption('strict');await lis.locator('#example').selectOption('[10,9,2,5,3,7,101,18]');await lis.locator('#speed').selectOption('350');await lis.locator('#play').click();await page.waitForTimeout(800);await lis.locator('#play').click();const lisPaused=await lis.locator('#counter').textContent();assert.ok(!lisPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await lis.locator('#counter').textContent(),lisPaused);
+  await page.locator('#notes').fill('严格递增找首个大于等于 x；前缀不一定是实际方案。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'严格递增找首个大于等于 x；前缀不一定是实际方案。');await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
+  await lis.locator('#seek').evaluate(e=>{e.value=20;e.dispatchEvent(new Event('input'));});
+  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await lis.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'test-results/lis-'+width+'.png',fullPage:true});}
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }

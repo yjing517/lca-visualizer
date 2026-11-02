@@ -247,4 +247,39 @@ window.PROBLEMS = [{
     "当前递推必须从左向右，不能套用背包题的倒序更新。截图只返回长度，不直接返回子序列。"
   ],
   "complexity": "时间 O(nm)，额外空间 O(m)。二维表和事件快照仅供可视化解释，原算法实际只保存一维数组 f 和 pre、tmp。"
+}, {
+  "id": "leetcode-300",
+  "number": "300",
+  "title": "最长递增子序列",
+  "difficulty": "中等",
+  "category": "动态规划",
+  "tags": [
+    "贪心",
+    "二分查找"
+  ],
+  "addedAt": "2026-11-02",
+  "source": "https://leetcode.cn/problems/longest-increasing-subsequence/",
+  "summary": "维护各长度的最小结尾，二分替换；对照 bisect_left 与截图 bisect_right 的差异。",
+  "statement": "求整数数组 nums 中最长严格递增子序列的长度。子序列可不连续，但必须保留原顺序。[10,9,2,5,3,7,101,18] → 4；[0,1,0,3,2,3] → 4；[7,7,7,7,7,7,7] → 1。1≤n≤2500，−10000≤nums[i]≤10000。",
+  "demo": "problems/lis/index.html",
+  "principles": [
+    {
+      "title": "各长度的最小结尾",
+      "text": "nums[0:ng] 保存各长度子序列的最小结尾；它不一定是一条真实子序列。结尾越小，未来越容易接上。"
+    },
+    {
+      "title": "首个 ≥x 的位置",
+      "text": "bisect_left 找到 j；j==ng 时增加长度，否则只替换结尾。严格递增不能接相等值；截图 bisect_right 求非递减，在全相等例中返回 7 而非 1。"
+    },
+    {
+      "title": "原地覆盖是安全的",
+      "text": "读取下标 i 时 ng≤i，写入 j≤ng≤i，不影响未来读取，但会修改输入。Python/Java 两版都保持这一约定。"
+    }
+  ],
+  "pitfalls": [
+    "子序列不要求连续，但不可改变相对顺序。",
+    "有效前缀不是实际解，ng 才是返回的长度。",
+    "截图的 bisect_right 应修正为 bisect_left；重复元素是识别错误的关键反例。"
+  ],
+  "complexity": "贪心与二分：时间 O(n log n)，原地版本额外空间 O(1)，会修改输入；单独 tails 数组版本需 O(n) 空间。"
 }];

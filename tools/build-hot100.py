@@ -604,6 +604,21 @@ def build():
                 ).strip()
                 + "\n"
             )
+            for case in cases:
+                if "_raw" in case["input"]:
+                    solution = next(
+                        node
+                        for node in parsed.body
+                        if isinstance(node, ast.ClassDef) and node.name == "Solution"
+                    )
+                    method = next(
+                        node for node in solution.body if isinstance(node, ast.FunctionDef)
+                    )
+                    parameter = method.args.args[1].arg
+                    case["input"] = {
+                        parameter if key == "_raw" else key: value
+                        for key, value in case["input"].items()
+                    }
             traces = [trace(n, py, c, java) for c in cases]
             out = ROOT / "dist/problems" / f"hot100-{n}"
             out.mkdir(parents=True, exist_ok=True)
@@ -615,7 +630,9 @@ def build():
                         "title": q["translatedTitle"],
                         "category": q["category"],
                         "focus": view[0].split(","),
-                        "cursors": json.loads((ROOT / "tools/hot100-cursors.json").read_text(encoding="utf8")).get(str(n), {}),
+                        "cursors": json.loads(
+                            (ROOT / "tools/hot100-cursors.json").read_text(encoding="utf8")
+                        ).get(str(n), {}),
                         "meaning": view[1],
                         "cases": traces,
                     },

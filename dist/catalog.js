@@ -352,4 +352,40 @@ window.PROBLEMS = [{
     "保存答案时必须生成独立副本或字符串。"
   ],
   "complexity": "时间 O(n·Cₙ)，辅助空间 O(n)，输出空间 O(n·Cₙ)，Cₙ 为卡特兰数。"
+}, {
+  "id": "leetcode-51",
+  "number": "51",
+  "title": "N 皇后",
+  "difficulty": "困难",
+  "category": "回溯",
+  "tags": [
+    "递归",
+    "DFS",
+    "剪枝"
+  ],
+  "addedAt": "2026-11-02",
+  "source": "https://leetcode.cn/problems/n-queens/",
+  "summary": "逐行放置与占用撤销；把 col 里的列号转成由 Q 和点组成的棋盘。",
+  "statement": "在 n×n 棋盘放 n 个皇后，使任意两者不同行、不同列、不同斜线，返回全部方案。Q 表示皇后，. 表示空格。n=4 有两解，n=1 返回 [[\"Q\"]]，n=2、3 无解。1≤n≤9。",
+  "demo": "problems/queens/index.html",
+  "principles": [
+    {
+      "title": "c 是列下标，不是字符",
+      "text": "col[r]=c 记录第 r 行皇后的位置。列表推导式 for c in col 按行取列号，与前面试放用的 c 作用不同：此处不搜索，只把已经找到的方案转成字符串。Python 3 推导式的循环变量在自己的作用域内。"
+    },
+    {
+      "title": "为什么点数是 n−1−c？",
+      "text": "左边 c 格空位 + 皇后 1 格 + 右边 n−1−c 格，合计 n 格。n=4、c=1 得到 .Q..。col=[1,3,0,2] 依次生成 .Q..、...Q、Q...、..Q.，外层 append 保存整个棋盘。"
+    },
+    {
+      "title": "对角线与撤销",
+      "text": "同一条 / 对角线 r+c 相同，同一条反方向对角线 r−c 相同。截图 Python 允许 diag2[r−c] 的负索引，长度 2n−1 足够区分全部差值；Java 不支持负索引，改用 r−c+n−1。返回后必须取消列与两条对角线标记，col 无需清空。"
+    }
+  ],
+  "pitfalls": [
+    "c 是从 0 开始的列号；for c in col 是逐行读取列号，不是再搜索一轮。",
+    "每行字符串长度必须为 n，右边点数是 n−1−c。",
+    "col 的旧值可以覆盖，但三个占用标记必须在返回后撤销。"
+  ],
+  "complexity": "搜索保守上界 O(n·n!)，每个解的棋盘转换 O(n²)；辅助空间 O(n)，结果空间 O(S·n²)。"
 }];

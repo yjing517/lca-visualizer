@@ -25,7 +25,7 @@ const path = require('node:path');
   await page.locator('#search').fill('236');
   assert.equal(await page.locator('#results .problem').count(), 1);
   await page.locator('#search').fill('递归');
-  assert.equal(await page.locator('#results .problem').count(), 9);
+  assert.equal(await page.locator('#results .problem').count(), 10);
   await page.locator('#search').fill('不存在的题目');
   assert.ok((await page.locator('#results').textContent()).includes('没有找到'));
   await page.locator('#search').fill('');
@@ -489,6 +489,7 @@ const path = require('node:path');
   await lis.locator('#seek').evaluate(e=>{e.value=20;e.dispatchEvent(new Event('input'));});
   for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await lis.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'test-results/lis-'+width+'.png',fullPage:true});}
   await require('./backtracking-additions-browser.cjs')(page,base);
+  await require('./queens-browser.cjs')(page,base);
   assert.deepEqual(errors, []);
   console.log('Passed: Python/Java switching and step highlighting, desktop/mobile, search/filter, routes, playback, persistence, backup/restore/cancel, invalid JSON, failed storage/demo, legacy and file opening.');
  } finally { await browser.close(); server.close(); }

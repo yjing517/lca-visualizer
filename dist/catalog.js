@@ -282,4 +282,74 @@ window.PROBLEMS = [{
     "截图的 bisect_right 应修正为 bisect_left；重复元素是识别错误的关键反例。"
   ],
   "complexity": "贪心与二分：时间 O(n log n)，原地版本额外空间 O(1)，会修改输入；单独 tails 数组版本需 O(n) 空间。"
+}, {
+  "id": "leetcode-216",
+  "number": "216",
+  "title": "组合总和 III",
+  "difficulty": "中等",
+  "category": "回溯",
+  "tags": [
+    "递归",
+    "DFS",
+    "剪枝"
+  ],
+  "addedAt": "2026-11-02",
+  "source": "https://leetcode.cn/problems/combination-sum-iii/",
+  "summary": "剩余目标够不够？先算上界，再选择",
+  "statement": "从 1 到 9 选择 k 个不同数字，使总和为 n，返回所有不重复组合。2≤k≤9，1≤n≤60。k=3,n=7 → [[1,2,4]]；k=3,n=9 → [[1,2,6],[1,3,5],[2,3,4]]；k=4,n=1 → []。",
+  "demo": "problems/combination-sum3/index.html",
+  "principles": [
+    {
+      "title": "上界公式来自等差数列",
+      "text": "还缺 d 个，只能从 1…i 里选。最大的 d 个是 i、i−1、…、i−d+1，总和为 (2i−d+1)d/2。t 超过它一定无解。若 i<d，候选数量不够，循环 j≥d 自然为空。"
+    },
+    {
+      "title": "选满为什么不用再判断 t==0？",
+      "text": "选满时 d=0，上界变为 0。前面的 t<0 或 t>0 已经排除非零剩余目标，所以能走到保存处必定 t=0。不能随意交换这两个判断的顺序。"
+    },
+    {
+      "title": "递减枚举与撤销",
+      "text": "选 j 后调用 dfs(j−1,t−j)，不能再用 j，也不会生成同一组的不同排列。返回后 pop 撤销本层选择；复制保存的答案不受撤销影响。截图输出递减排列，题目允许任意顺序。"
+    }
+  ],
+  "pitfalls": [
+    "return 只返回上一层，父层仍会继续分支。",
+    "保存答案时必须生成独立副本或字符串。"
+  ],
+  "complexity": "最坏按候选 1…9 的子集计，时间 O(k·2⁹)，辅助空间 O(k)，结果另计；剪枝会减少实际搜索。"
+}, {
+  "id": "leetcode-22",
+  "number": "22",
+  "title": "括号生成",
+  "difficulty": "中等",
+  "category": "回溯",
+  "tags": [
+    "递归",
+    "DFS",
+    "剪枝"
+  ],
+  "addedAt": "2026-11-02",
+  "source": "https://leetcode.cn/problems/generate-parentheses/",
+  "summary": "有未匹配的左括号，才能放右括号",
+  "statement": "给定 n 对括号，生成所有有效括号字符串。1≤n≤8。n=1 → [\"()\"]；n=3 → [\"((()))\",\"(()())\",\"(())()\",\"()(())\",\"()()()\"]。",
+  "demo": "problems/parentheses/index.html",
+  "principles": [
+    {
+      "title": "open 不是未匹配余额",
+      "text": "open 是已经使用的左括号总数；i 是已填总数，因此右括号数为 i−open，未匹配余额为 2open−i。放右括号时 open 不变。"
+    },
+    {
+      "title": "两个 if 不是 if / else",
+      "text": "当 open<n 且右括号数<左括号数时，两种选择都合法。先探索整个左分支，返回后仍要判断右分支。合法前缀从不出现右括号比左括号多。"
+    },
+    {
+      "title": "固定数组为什么无需 pop？",
+      "text": "每层只负责 path[i]，返回后用下一个选择覆盖同一格。后面浅色格子可能残留旧值，但不是当前有效前缀；只有填满 2n 格才 join 保存字符串。Java new String(path) 同样生成独立答案。"
+    }
+  ],
+  "pitfalls": [
+    "return 只返回上一层，父层仍会继续分支。",
+    "保存答案时必须生成独立副本或字符串。"
+  ],
+  "complexity": "时间 O(n·Cₙ)，辅助空间 O(n)，输出空间 O(n·Cₙ)，Cₙ 为卡特兰数。"
 }];

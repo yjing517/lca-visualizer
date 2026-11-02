@@ -1,0 +1,2 @@
+const snippets={"Python": ["", "", "class Solution:", "", "    def climbStairs(self, n: int) -> int:", "        (a, b) = (0, 1)", "        for _ in range(n):", "            (a, b) = (b, a + b)", "        return b"], "Java": ["import java.util.*;", "class Solution {", "    public int climbStairs(int n) {", "        int a = 0, b = 1;", "        for (int i = 0; i < n; ++i) {", "            int c = a + b;", "            a = b;", "            b = c;", "        }", "        return b;", "    }", "}"]};
+window.HOT100_SNIPPETS=snippets;

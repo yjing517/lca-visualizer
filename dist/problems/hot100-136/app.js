@@ -1,0 +1,2 @@
+const snippets={"Python": ["from typing import List", "", "class Solution:", "", "    def singleNumber(self, nums: List[int]) -> int:", "        ans = 0", "        for v in nums:", "            ans ^= v", "        return ans"], "Java": ["import java.util.*;", "class Solution {", "    public int singleNumber(int[] nums) {", "        int ans = 0;", "        for (int v : nums) {", "            ans ^= v;", "        }", "        return ans;", "    }", "}"]};
+window.HOT100_SNIPPETS=snippets;

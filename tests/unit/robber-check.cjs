@@ -19,6 +19,9 @@ for(const [mode,stage]of Object.entries(stages)){
  }
  for(const bad of [null,[-1],[401],Array(9).fill(1),[1.5]])assert.throws(()=>stage.trace(bad));
 }
+assert.equal(stages.dp.trace([]).events.at(-1).line,'empty');
+for(const lang of ['Python','Java'])assert.match(stages.dp.snippets[lang][stages.dp.lines[lang].empty],/return 0/);
+assert.equal(stages.rolling.trace([2,7,9]).events.at(-1).newF,11);
 const demo=stages.memo.trace([2,7,9,3,1]).events;
 assert.ok(demo.some(e=>e.line==='hit'));assert.ok(demo.filter(e=>e.line==='skip').length<stages.brute.trace([2,7,9,3,1]).events.filter(e=>e.line==='skip').length);
 assert.deepEqual(stages.dp.trace([2,7,9,3,1]).events.at(-1).f,[0,2,7,11,11,12]);

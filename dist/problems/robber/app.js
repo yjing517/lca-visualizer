@@ -182,8 +182,9 @@ function traceDP(nums) {
  const events=[],f=Array(nums.length+1).fill(null);f[0]=0;
  const emit=(line,message,extra={})=>events.push({line,message,f:[...f],stack:[],answer:null,...extra});
  emit('start','f[i] 表示前 i 间房屋的最优金额。f[0] = 0；未推导的格子显示 ?（代码数组先分配为 0）。',{i:0});
+ if(!nums.length){emit('empty','没有房屋，直接返回 0，不访问 nums[0] 或 f[1]。',{i:0,answer:0});return {events,nodes:[]};}
  if(nums.length) {
-  f[1]=nums[0];emit('base',`只有第一间房屋，f[1] = nums[0] = ${nums[0]}。`,{i:1});
+  f[1]=nums[0];emit('base',`只有第一间房屋，f[1] = nums[0] = ${nums[0]}。`,{i:1,value:f[1]});
  }
  for(let i=2;i<=nums.length;i++) {
   const skip=f[i-1],take=f[i-2]+nums[i-1],value=Math.max(skip,take);
@@ -204,12 +205,12 @@ function traceRolling(nums) {
   f0=f1;emit('shift',`先把旧 f1 保存到 f0，得到 f0 = ${f0}；new_f = ${newF} 已保留，不会误用更新后的 f0。`,{i,x,skip,take,newF});
   f1=newF;emit('write',`再把 new_f 写入 f1 = ${f1}。本轮结束：f0 = f[${i-1}]，f1 = f[${i}]。`,{i,x,skip,take,newF});
  });
- emit('done',`最终 f1 = ${f1}。只保存两个历史状态和一个新值，额外空间 O(1)。`,{i:nums.length,answer:f1});
+ emit('done',`最终 f1 = ${f1}。只保存两个历史状态和一个新值，额外空间 O(1)。`,{i:nums.length,answer:f1,newF:nums.length?f1:null});
  return {events,nodes:[]};
 }
 const stageLines={
  memo:{Python:{start:11,check:5,hit:4,zero:7,skip:8,take:9,store:10,return:10,done:11},Java:{start:4,check:6,hit:8,zero:11,skip:14,take:15,store:17,return:18,done:4}},
- dp:{Python:{start:4,base:7,compare:11,write:12,done:13},Java:{start:3,base:7,compare:11,write:12,done:14}},
+ dp:{Python:{start:4,empty:6,base:7,compare:11,write:12,done:13},Java:{start:3,empty:5,base:7,compare:11,write:12,done:14}},
  rolling:{Python:{start:3,compare:6,shift:7,write:8,done:9},Java:{start:2,compare:5,shift:6,write:7,done:9}}
 };
 const stages={

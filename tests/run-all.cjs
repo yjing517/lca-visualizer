@@ -34,6 +34,7 @@ const GROUPS = {
     ['backtracking-additions-check.cjs', '回溯补充题'],
     ['queens-check.cjs', 'N 皇后'],
     ['hot100-check.cjs', 'Hot 100 题库与轨迹'],
+    ['line-maps-check.cjs', '双语言行映射语义'],
   ].map(([file, label]) => ({
     name: `unit/${file}`,
     label,

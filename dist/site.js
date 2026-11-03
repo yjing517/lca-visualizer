@@ -94,15 +94,31 @@
   });
   function backup() {
     const currentView = viewToken;
+    // 记录读不出来时，空记录不能当成正常备份导出，否则用户会误以为已保存。
+    const exportPanel = store.canBackup
+      ? `<section class="panel backupbox"><h2>导出个人记录</h2><p>包含所有题目的笔记、掌握程度和待复习标记。题目与动画由网站维护，不需要放进个人备份。</p><div class="actions"><button id="export" class="primary">↓ 下载备份文件</button></div></section>`
+      : `<section class="panel backupbox"><h2>暂时无法导出正常备份</h2><p class="danger">${esc(store.error)}</p>${store.rawSnapshot
+        ? '<p>下面下载的是浏览器里无法解析的原始内容，请先留档；它不是正常备份，恢复前不要清理浏览器数据或更换网址。</p><div class="actions"><button id="exportRaw" class="primary">↓ 下载原始数据（恢复用）</button></div>'
+        : '<p>请先恢复浏览器对本地存储的访问权限，再刷新重试。</p>'}</section>`;
     $('content').innerHTML = heading('KEEP YOUR THINKING SAFE', '把自己的理解，好好保存。', '导出笔记与掌握程度。以后换个浏览器，也能接着复习。') +
-      `<section class="panel backupbox"><h2>导出个人记录</h2><p>包含所有题目的笔记、掌握程度和待复习标记。题目与动画由网站维护，不需要放进个人备份。</p><div class="actions"><button id="export" class="primary">↓ 下载备份文件</button></div></section>
-      <section class="panel backupbox"><h2>从备份恢复</h2><p>先选择本网站导出的 JSON 文件，通过检查后再确认导入。备份中同一道题的记录会覆盖当前记录；其他题目的记录保留。</p><div class="actions"><label class="field">选择备份文件<input class="fileinput" type="file" accept=".json,application/json" id="importFile"></label></div><div id="importPreview" class="backupstatus" role="status" aria-live="polite"></div><div class="actions"><button id="confirmImport" class="primary" hidden>确认覆盖并导入</button><button id="cancelImport" hidden>取消</button></div></section>
+      exportPanel +
+      `<section class="panel backupbox"><h2>从备份恢复</h2><p>先选择本网站导出的 JSON 文件，通过检查后再确认导入。备份中同一道题的记录会覆盖当前记录；其他题目的记录保留。</p>${store.canBackup ? '' : '<p class="danger">当前记录不可读，导入成功后会用备份内容替换它。</p>'}<div class="actions"><label class="field">选择备份文件<input class="fileinput" type="file" accept=".json,application/json" id="importFile"></label></div><div id="importPreview" class="backupstatus" role="status" aria-live="polite"></div><div class="actions"><button id="confirmImport" class="primary" hidden>确认覆盖并导入</button><button id="cancelImport" hidden>取消</button></div></section>
       <section class="panel backupbox"><h2>关于记录保存</h2><ul><li>记录只保存在此浏览器，不会自动跨设备同步。</li><li>清除浏览器数据、使用无痕窗口或更换网站地址，可能无法继续读取旧记录；请定期导出。</li><li>本地网页与在线网站的记录分开保存，可以用备份文件迁移。</li></ul></section>`;
-    $('export').onclick = () => {
-      const blob = new Blob([JSON.stringify(store.backup(), null, 2)], { type: 'application/json' });
+    const exportButton = $('export');
+    if (exportButton) exportButton.onclick = () => {
+      try {
+        const blob = new Blob([JSON.stringify(store.backup(), null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url;
+        link.download = `算法拾遗-复习备份-${new Date().toLocaleDateString('sv-SE')}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 10000);
+        notice('已生成备份，请保存浏览器下载的 JSON 文件。');
+      } catch (error) { notice(error.message); }
+    };
+    const rawButton = $('exportRaw');
+    if (rawButton) rawButton.onclick = () => {
+      const blob = new Blob([store.rawSnapshot], { type: 'text/plain;charset=utf-8' });
       const url = URL.createObjectURL(blob), link = document.createElement('a'); link.href = url;
-      link.download = `算法拾遗-复习备份-${new Date().toLocaleDateString('sv-SE')}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 10000);
-      notice('已生成备份，请保存浏览器下载的 JSON 文件。');
+      link.download = `算法拾遗-原始记录-${new Date().toLocaleDateString('sv-SE')}.txt`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 10000);
+      notice('已下载原始数据，请保留该文件以便恢复。');
     };
     let pending = null, selection = 0;
     const resetPending = () => { pending = null; $('confirmImport').hidden = $('cancelImport').hidden = true; };

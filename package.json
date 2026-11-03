@@ -2,14 +2,30 @@
   "name": "algorithm-notebook",
   "version": "1.0.0",
   "private": true,
+  "description": "算法拾遗：Python/Java 双语言算法可视化与个人错题集（纯静态站点）",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yjing517/lca-visualizer.git"
+  },
+  "keywords": [
+    "algorithms",
+    "leetcode",
+    "visualization",
+    "hot100",
+    "static-site"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "node serve.cjs",
-    "test": "npm run test:unit && npm run test:algorithms",
+    "test": "node tests/run-all.cjs",
+    "test:all": "node tests/run-all.cjs unit algorithms browser",
+    "test:unit": "node tests/run-all.cjs unit",
+    "test:algorithms": "node tests/run-all.cjs algorithms",
+    "test:browser": "node tests/run-all.cjs browser",
     "test:complexity": "node tests/unit/complexity-check.cjs",
-    "test:complexity-browser": "node tests/browser/complexity-browser-check.cjs",
-    "test:browser": "node tests/browser/browser-check.cjs && node tests/browser/hot100-browser-check.cjs && node tests/browser/complexity-browser-check.cjs && node tests/browser/matrix-zeroes-browser.cjs && node tests/browser/keyboard-browser-check.cjs && node tests/browser/problem-switcher-browser.cjs",
-    "test:unit": "node tests/unit/check.cjs && node tests/unit/bottom-left-check.cjs && node tests/unit/records-check.cjs && node tests/unit/complexity-check.cjs && node tests/unit/languages-check.cjs && node tests/unit/phone-check.cjs && node tests/unit/subsets-check.cjs && node tests/unit/combinations-check.cjs && node tests/unit/permutations-check.cjs && node tests/unit/palindrome-check.cjs && node tests/unit/robber-check.cjs && node tests/unit/sliding-window-check.cjs && node tests/unit/lcs-check.cjs && node tests/unit/lis-check.cjs && node tests/unit/backtracking-additions-check.cjs && node tests/unit/queens-check.cjs && node tests/unit/hot100-check.cjs",
-    "test:algorithms": "python tools/verify-hot100.py && python tools/check-hot100-properties.py && python tools/check-hot100-java.py && python tools/check-matrix-zeroes.py"
+    "test:complexity-browser": "node tests/browser/complexity-browser-check.cjs"
   },
   "devDependencies": {
     "playwright": "1.64.1"

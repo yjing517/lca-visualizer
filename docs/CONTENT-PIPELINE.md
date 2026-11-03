@@ -38,7 +38,7 @@
 
 - `app.js`：Python/Java 双语言代码行 + 页面逻辑；
 - `data.js`：可离线打开的轨迹（`window.HOT100_DATA`），由真实 Python 执行生成；
-- `data.json`：同一轨迹的校验数据（构建与测试使用，不被浏览器加载）。
+- `data.json` 轨迹校验数据：构建与测试使用，不被浏览器加载；存放在 `tools/traces/hot100-<题号>.json`，不随站点发布。
 
 数据与生成器：
 
@@ -100,7 +100,8 @@ python tools/build-hot100.py
 对照页另提供复制原矩阵（Θ(mn) 辅助空间）与首行首列标记（Θ(1) 辅助空间），三种方法均为 Θ(mn) 时间。
 
 - `tools/build-matrix-zeroes.py` 保存新增 Python/Java 实现、人工核对的行映射与分阶段解释，
-  生成独立代码与真实 Python 轨迹；`tools/build-hot100.py` 结束时调用它。
+  生成独立代码与真实 Python 轨迹；`tools/build-hot100.py` 结束时调用它。校验轨迹写入
+  `tools/traces/hot100-73-<variant>.json`，与主题轨迹一样不进入发布目录。
 - `python tools/check-matrix-zeroes.py` 对三种方案分别执行 692 个矩阵检查，并验证轨迹未过期。
 - 题目 id、原分类标签、个人记录及默认演示的复杂度分析继续对应原有行列标记法。
 

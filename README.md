@@ -32,6 +32,7 @@ npm start          # 打开终端输出的本地地址（默认 http://127.0.0.1
 dist/                发布目录：站点页面、运行时脚本、题目演示（手写页面即源码）
   problems/          每题一个目录：独立页面 + 演示脚本 + 轨迹数据
 tools/               题库数据、生成器、Python/Java 算法验证、上游参考材料与共享工具
+  traces/            轨迹校验数据（构建与测试使用，不随站点发布）
 tests/unit/          Node 检查：轨迹、题库、双语言、记录、复杂度、生成数据一致性
 tests/browser/       Playwright 验收：主站、Hot 100、复杂度、矩阵、键盘、切题
 tests/run-all.cjs    聚合测试运行器（分组执行、失败后继续、统一汇总）

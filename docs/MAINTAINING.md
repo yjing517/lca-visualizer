@@ -58,6 +58,7 @@ GitHub Actions（`.github/workflows/checks.yml`）在推送和 PR 时运行 `npm
 | 个人笔记、备份、复习状态 | `dist/records.js` | `tests/unit/records-check.cjs` 与主站浏览器检查 |
 | 手写演示 | `dist/problems/<目录>/` | 对应 unit 检查、语言检查、浏览器检查 |
 | Hot 100 教学代码、示例与轨迹 | `tools/build-hot100.py`、`tools/teaching-overrides.py`、`tools/hot100-*.json` | `python tools/build-hot100.py` |
+| 轨迹校验数据 | `tools/traces/` | 生成器写出；`verify-hot100.py`、`hot100-check.cjs`、`check-matrix-zeroes.py` 读取 |
 | 双语言行映射 | `tools/hot100-line-maps.json` | 人工核对后更新；构建器校验摘要 |
 | 复杂度分析 | `tools/complexity-profiles.cjs` | `node tools/build-complexity.cjs` |
 | 矩阵置零扩展方案 | `tools/build-matrix-zeroes.py` | `python tools/build-matrix-zeroes.py` |
@@ -65,7 +66,7 @@ GitHub Actions（`.github/workflows/checks.yml`）在推送和 PR 时运行 `npm
 | 生成器共享的代码提取 | `tools/read-snippets.cjs` | 被 `build-complexity.cjs` 与部分 unit 检查复用 |
 
 `dist/` 是发布目录，但并非全部可再生：手写页面就是源码。不要删除整个目录再构建，
-也不要直接批量迁移为 `src/`。Hot 100 的 89 题 `app.js`、`data.js`、`data.json`、页面，
+也不要直接批量迁移为 `src/`。Hot 100 的 89 题 `app.js`、`data.js`、页面，
 以及矩阵扩展文件和 `dist/complexity-data.js` 由工具生成；优先修改上表的维护入口。
 `dist/catalog.js` 的生成标记区段归构建器维护，旧题条目由人工维护。
 

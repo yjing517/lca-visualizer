@@ -798,6 +798,8 @@ def register(new, qs):
             + reference
             + """" target="_blank" rel="noopener">doocs/leetcode</a>，按 <a href="../hot100-LICENSE.txt">CC BY-SA 4.0</a> 保留署名与许可；部分实现为便于逐步教学已展开。节点类型由题目平台提供。轨迹缓存和图形副本不计入算法空间复杂度。</p></main><script src="data.js"></script><script src="app.js"></script><script src="../hot100-player.js"></script></body></html>"""
         )
+        if n == 73:
+            page = page.replace('<div class="toolbar">', '<p class="matrix-extension"><a href="optimizations.html">扩展：对照三种优化方案 →</a></p><div class="toolbar">', 1)
         (out / "index.html").write_text(page, encoding="utf8")
         (out / "data.js").write_text(
             "window.HOT100_DATA=" + (out / "data.json").read_text(encoding="utf8") + ";\n",
@@ -826,3 +828,4 @@ if __name__ == "__main__":
     _, fails = build()
     if fails:
         sys.exit(1)
+    runpy.run_path(str(ROOT / "tools/build-matrix-zeroes.py"), run_name="__main__")

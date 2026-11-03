@@ -4,7 +4,8 @@ const vm=require('node:vm');
 const assert=require('node:assert/strict');
 const sandbox={window:{}};
 vm.runInNewContext(fs.readFileSync('dist/catalog.js','utf8'),sandbox);
-for(const problem of sandbox.window.PROBLEMS) {
+const variants = ['copy', 'constant'].map(key => ({id: `leetcode-73-${key}`, demo: `problems/hot100-73/${key}/index.html`}));
+for(const problem of [...sandbox.window.PROBLEMS, ...variants]) {
  const demo=path.join('dist',problem.demo),html=fs.readFileSync(demo,'utf8');
  const selector=html.match(/<select\b[^>]*\bid="lang"[^>]*>([\s\S]*?)<\/select>/);
  assert.ok(selector,`${problem.id}: 缺少语言选择器`);

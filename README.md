@@ -54,3 +54,12 @@
 - `npm test` 包含完整性、生成数据一致性、代码摘要、安全转义及部分执行结构对照检查。它们不能代替人工推导。`npm run test:complexity-browser` 验证全部题目的展开、实际文字、操作表、桌面/手机布局、键盘定位、记录及播放进度保留和本地文件打开；使用与其他浏览器检查相同的 Playwright 环境。
 
 库细节核对参考 [CPython 3.10 排序](https://docs.python.org/3.10/howto/sorting.html)、[CPython 3.10.11 堆源码](https://github.com/python/cpython/blob/v3.10.11/Modules/_heapqmodule.c)、[OpenJDK 17 排序源码](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/DualPivotQuicksort.java)、[Java 17 Arrays](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html) 与 [Java 17 PriorityQueue](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html)。库版本变化时须重新核对实现相关说明。
+
+## 矩阵置零的扩展方案
+
+73 保留原有 O(m+n) 行列标记演示，并在原演示顶部链接 `problems/hot100-73/optimizations.html`。对照页另提供复制原矩阵（Θ(mn) 辅助空间）与首行首列标记（Θ(1) 辅助空间），三种方法均为 Θ(mn) 时间。首行首列方案使用两个布尔量保存边界原始情况，先清理内部、最后清理边界。
+
+- `tools/build-matrix-zeroes.py` 保存新增 Python/Java 实现、人工核对的行映射及分阶段解释；生成独立代码与实际 Python 执行轨迹。`tools/build-hot100.py` 结束时调用它，保留原演示的扩展入口。
+- `python tools/check-matrix-zeroes.py` 对三种方案分别执行 Python/Java 的 692 个矩阵检查，并验证新增轨迹及代码未过期；已加入 `npm test`。新增独立演示同时纳入双语言检查。
+- `node matrix-zeroes-browser.cjs` 检查全部新增示例结果、逐步双语言高亮、切换进度、播放回退、方案切换、本地文件及桌面/手机布局；使用现有 Playwright 环境。
+- 题目 id、原分类标签、个人记录以及默认演示的复杂度分析继续对应原有行列标记法；各扩展方案的复杂度在对照页单独说明。

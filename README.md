@@ -1,93 +1,71 @@
-# 算法拾遗 · 个人可视化错题集
+# 算法拾遗 · Python/Java 双语言算法可视化错题集
 
-## 项目结构与开发入口
+[![checks](https://github.com/yjing517/lca-visualizer/actions/workflows/checks.yml/badge.svg)](https://github.com/yjing517/lca-visualizer/actions/workflows/checks.yml)
 
-- `dist/`：直接发布的静态站点，包含手写页面及生成内容；具体编辑入口见 [维护指南](docs/MAINTAINING.md)。
-- `tools/`：题库数据、生成器、Python/Java 算法验证和上游参考材料。
-- `tests/unit/`：算法轨迹、题库、双语言、记录存储及复杂度检查。
-- `tests/browser/`：浏览器验收，以及由主验收脚本调用的辅助检查。
-- `serve.cjs`：仅用于本地预览；`read-snippets.cjs`：生成器与测试共享的代码提取工具。
+把「刷过的题」变成「真正理解的题」。这是一个纯静态的个人算法学习站：103 道 LeetCode 题目
+（覆盖 Hot 100 全部 100 题，另保留 513、77、216），每题都配有可单步回放的执行过程、
+Python 与 Java 两份等价实现、最好/最坏复杂度分析，以及保存在浏览器里的个人笔记。
 
-开发与扩展前先读 [维护指南](docs/MAINTAINING.md)。所有检查命令从项目根目录运行。
+## 功能
 
-## 维护范围：桌面网页
+- **逐步回放**：按调用栈、变量快照和数据结构状态显示每一步；支持上一步/下一步、自动播放、进度拖动。
+- **双语言对照**：同一算法同时提供 Python 与 Java，切换语言保留当前示例和进度，高亮映射到对应代码行。
+- **复杂度分析**：每题给出最好/最坏时间与空间、触发条件和原因；LRU、Trie、最小栈、数据流中位数按操作拆分。
+- **个人记录**：掌握程度、待复习标记和笔记保存在浏览器（`algorithm-notebook.v1`），可导出/导入 JSON 备份。
+- **题库检索**：按题号、名称、标签搜索，按题型和掌握程度筛选；详情页可连续切换上一题/下一题。
+- **纯静态**：无后端、无账号、无外部请求；`npm start` 或直接打开 `dist/index.html` 即可使用。
 
-按用户最新要求，后续仅维护桌面浏览器的功能与布局，不再新增手机适配或安排手机专项验收。已有响应式样式与历史手机检查代码保留；本文件下文提到的手机验收属于早期流程，以本条最新范围为准。后续功能测试、截图和发布验收以桌面为准。
+## 快速开始
 
-## 打开与备份
+```sh
+# 仅需 Node.js 22+
+npm start          # 打开终端输出的本地地址（默认 http://127.0.0.1:4173）
+```
 
-运行 `npm start`，浏览器打开终端给出的本地地址。只需 Node.js，无须安装依赖。也可直接打开 `dist/index.html`；本地文件的存储规则由浏览器决定，建议长期使用同一个本地地址或上线后的固定网址。
+也可以直接双击 `dist/index.html`。本地文件与线上网址的浏览器存储相互独立，长期使用建议固定一个地址。
 
-笔记、掌握程度和待复习标记保存于当前浏览器。发布题目不清除记录；更换设备、浏览器或网址前，在“记录备份”导出 JSON，再到新环境导入。确认覆盖前可以取消。无痕模式或清理浏览器数据会影响记录保存。
+## 目录结构
 
-`dist/lca.html` 是第一版最近公共祖先演示的保留入口；新版使用 `#/problem/leetcode-236`。
+```text
+dist/                发布目录：站点页面、运行时脚本、题目演示（手写页面即源码）
+  problems/          每题一个目录：独立页面 + 演示脚本 + 轨迹数据
+tools/               题库数据、生成器、Python/Java 算法验证、上游参考材料与共享工具
+tests/unit/          Node 检查：轨迹、题库、双语言、记录、复杂度、生成数据一致性
+tests/browser/       Playwright 验收：主站、Hot 100、复杂度、矩阵、键盘、切题
+tests/run-all.cjs    聚合测试运行器（分组执行、失败后继续、统一汇总）
+docs/                架构、维护、内容生产与路线图文档
+serve.cjs            仅用于本地预览的静态服务器
+```
 
-## 持续收录新题
+## 文档
 
-### 强制双语言规则
+| 文档 | 内容 |
+| --- | --- |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | 运行时分层、数据流、目录职责、关键不变量与扩展点 |
+| [docs/MAINTAINING.md](docs/MAINTAINING.md) | 环境、测试命令、改什么去哪里、新增题目与发布流程 |
+| [docs/CONTENT-PIPELINE.md](docs/CONTENT-PIPELINE.md) | 双语言规则、Hot 100 生成链路、行映射/复杂度锁、演示约定 |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | 待修问题与功能模块规划（按优先级） |
 
-- 每道题、每个新增解法必须同时提供 **Python 和 Java** 实现，不能只收录截图中的语言。两版采用相同算法、示例和边界约定，并包含所需的标准库导入；题目平台提供的节点类型可省略。
-- 演示提供 `id="lang"` 的语言选择器，选项值为 `Python` 和 `Java`。切换语言保留当前示例、进度、树或队列状态，当前执行步骤映射到所选语言的对应代码行。
-- 演示脚本使用 `const snippets={...};` 保存两种语言的代码行，便于检查实际代码内容。新增演示必须纳入双语言检查。
-- 执行 `npm test` 检查题库中所有题目的双语言代码及入口；浏览器验收覆盖两种语言的切换、逐步高亮和最终结果。任一语言缺失或验证失败，不得发布。
+## 测试
 
-1. **截图分析**：确认题意、代码、示例和卡点；区分截图中的题目内容与实际请求，缺少关键信息时补充确认。
-2. **新题制作**：在 `dist/problems/<题目目录>/` 放入独立 HTML 和演示脚本。提供单步、回退、播放、代码高亮和中文解释；按题型选择图形，不强制套用二叉树。
-3. **登记分类**：在 `dist/catalog.js` 添加条目，填写与已有条目相同的字段。`id` 一旦发布就保持不变，改名或补充讲解不更换 id。题型和标签使用已有词汇；首页、搜索、分类自动更新。同题的新解法放在原题演示中。
-4. **验证**：执行 `npm test`，以及配置好环境提供的 Playwright 后执行 `node tests/browser/browser-check.cjs`；给新算法加入有意义的输入输出检查，检查演示路径存在、双语言切换与高亮、各播放操作、桌面和手机布局。确认新增条目后既有笔记仍可读取。
-5. **发布**：复用 `.openai/hosting.json` 的站点身份，通过 Sites 工作流同步源码、打包、发布；保留私有访问。仅发布成功后交付在线地址。
+```sh
+npm ci                              # 安装 Playwright（仅浏览器验收需要）
+npx playwright install chromium
+npm test                            # unit + algorithms，约 1-2 分钟
+npm run test:browser                # 浏览器验收，需要 Playwright
+```
 
-演示嵌入详情页时，在可交互后向父页面发送 `{ type: 'algorithm-demo-ready', height: 文档内容高度 }`，并用 `ResizeObserver` 在内容尺寸改变时再次报告。父页面仅接收来自当前演示窗口的消息。同源的在线页面还会校验消息来源。参考现有 LCA 演示，使用内容高度，避免以视口高度反复撑大 iframe。超时未就绪时，题目页会提示独立打开演示。
+`npm test` 会执行 Node 检查与 Python/Java 验证，覆盖 261 个双语言示例、轨迹快照重放、
+固定种子性质对照和 Java 编译运行。GitHub Actions 在每次推送和 PR 时运行同样的检查。
 
-个人记录使用 `algorithm-notebook.v1` 存储键，按稳定题目 id 关联，独立于题目清单。备份包含版本、导出时间及记录；导入完整验证后才显示覆盖确认，写入失败保留原记录。尚未收录题目的导入记录也会保留。
+## 维护范围
 
-## Hot 100 的长期维护
+当前只维护桌面浏览器上的功能与布局；已有响应式样式与历史小屏检查保留，但不再新增手机专项适配。
+具体约束见 [docs/MAINTAINING.md](docs/MAINTAINING.md)。
 
-当前采用力扣中文站 `top-100-liked` 学习计划，清单快照位于 `tools/hot100.json`。100 道题全部覆盖；题库另保留 513、77、216，共 103 题。Hot 100 标签用于搜索，不改变已有题目的分类和记录。
+## 许可与署名
 
-本次新增的 89 题使用独立入口 `dist/problems/hot100-<题号>/`，共享播放界面。每题自己的 `app.js` 保留 Python、Java 代码；`data.js` 提供可离线打开的轨迹，`data.json` 是同一轨迹的校验数据。轨迹由实际执行 Python 代码生成，并与独立的示例答案核对；Java 实现另行编译运行相同输入。轨迹是固定教学示例，不在浏览器中执行 Python 或 Java。
-
-- `tools/upstream/` 保存 doocs/leetcode 的参考实现、题意和许可证；`tools/teaching-overrides.py` 保存为教学展开的实现。保留原始参考文件，修改教学实现时注明原因。
-- `tools/hot100-views.json` 指定每题重点变量及状态含义；`hot100-cursors.json` 明确每个数组的下标映射，例如编辑距离的字符位置是 `i−1`，不能直接用前缀长度 `i`。`hot100-hints.json` 和 `hot100-complexities.json` 维护关键原理与需特别说明的复杂度。
-- `tools/hot100-line-maps.json` 是明确的双语言行映射，并绑定两版代码摘要。修改代码后必须人工核对并更新映射；构建器遇到摘要不符会失败，不会猜测新的高亮位置。Python 的复合语句可以对应 Java 的多条操作，界面显示对应逻辑行，切换时使用同一个状态快照。
-- 运行 `python tools/build-hot100.py` 重新生成新增题目及目录清单的标记区段。旧题的原始条目、演示和个人记录不由生成器重写。更新官方清单前先核对差异；现有 89 题构建器不自动接纳未来新增题号。
-- 使用 Python 3.10+、JDK 17+ 和 Node.js 运行 `npm test`，包含原题回归、261 个双语言示例、完整快照重放及固定种子的穷举对照检查。日常浏览站点仍只需要浏览器，启动本地服务只需要 Node.js。
-- 使用环境已提供的 Playwright 运行 `node tests/browser/browser-check.cjs` 和 `node tests/browser/hot100-browser-check.cjs`。后者逐题检查示例、前进回退、暂停重置、两种语言全步骤高亮、桌面/手机布局和新旧记录隔离。必要时通过 `NODE_PATH` 指向环境提供的模块，不提交机器路径或依赖副本。
-
-每次发布前，人工查看数组/窗口、矩阵/DP、树/递归、链表/缓存、图、堆、回溯等不同题型的截图；自动检查不能代替教学内容与代码对应关系的核对。题解和代码引用保留 doocs/leetcode 署名及 CC BY-SA 4.0 许可，见演示页底部。
-
-## 最好与最坏情况的复杂度分析
-
-每题详情在题意下方提供“复杂度分析”：默认显示最坏时间与空间摘要，展开后查看最好、最坏情形、触发条件及原因。页首“查看复杂度”按钮可用键盘打开并定位。输入规模、辅助空间、返回结果空间及语言差异分别说明；LRU、Trie、最小栈和数据流中位数还按公开操作拆分。
-
-分析以当前显示的代码为准，不按题型套模板。例如 198 是无缓存递归；53、45、152 的 Python 切片占线性空间；二分边界查找即使命中中点也不直接返回；437 中归零的前缀和键没有被删除。平均、均摊和严格单次最坏不能混写。对固定整数参数、输出数量和保守上界的限制，在各题中明确注明。
-
-- 编辑 `tools/complexity-profiles.cjs`，每题填写时间、空间各自的 `best`、`worst`，包括 `bound`、`when`、`why`，并解释结果存储。默认是辅助空间；确实使用总峰值的题目通过 `spaceLabel` 明示，避免重复计算结果。
-- 运行 `node tools/build-complexity.cjs` 生成 `dist/complexity-data.js`。详情页使用这一结构化分析；旧 `catalog.js` 的 `complexity` 字段仅作兼容保留，不再作为主要分析展示，Hot 100 生成器不会覆盖新模块。
-- `tools/complexity-code-lock.json` 绑定两种语言的代码摘要。解法改动后，先逐项复核分析，再用 `node tools/build-complexity.cjs --accept-reviewed-code` 记录已核对的代码。该选项只记录摘要，不会自动分析或保证复杂度正确。
-- `npm test` 包含完整性、生成数据一致性、代码摘要、安全转义及部分执行结构对照检查。它们不能代替人工推导。`npm run test:complexity-browser` 验证全部题目的展开、实际文字、操作表、桌面/手机布局、键盘定位、记录及播放进度保留和本地文件打开；使用与其他浏览器检查相同的 Playwright 环境。
-
-库细节核对参考 [CPython 3.10 排序](https://docs.python.org/3.10/howto/sorting.html)、[CPython 3.10.11 堆源码](https://github.com/python/cpython/blob/v3.10.11/Modules/_heapqmodule.c)、[OpenJDK 17 排序源码](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/DualPivotQuicksort.java)、[Java 17 Arrays](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html) 与 [Java 17 PriorityQueue](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html)。库版本变化时须重新核对实现相关说明。
-
-## 矩阵置零的扩展方案
-
-73 保留原有 O(m+n) 行列标记演示，并在原演示顶部链接 `problems/hot100-73/optimizations.html`。对照页另提供复制原矩阵（Θ(mn) 辅助空间）与首行首列标记（Θ(1) 辅助空间），三种方法均为 Θ(mn) 时间。首行首列方案使用两个布尔量保存边界原始情况，先清理内部、最后清理边界。
-
-- `tools/build-matrix-zeroes.py` 保存新增 Python/Java 实现、人工核对的行映射及分阶段解释；生成独立代码与实际 Python 执行轨迹。`tools/build-hot100.py` 结束时调用它，保留原演示的扩展入口。
-- `python tools/check-matrix-zeroes.py` 对三种方案分别执行 Python/Java 的 692 个矩阵检查，并验证新增轨迹及代码未过期；已加入 `npm test`。新增独立演示同时纳入双语言检查。
-- `node tests/browser/matrix-zeroes-browser.cjs` 检查全部新增示例结果、逐步双语言高亮、切换进度、播放回退、方案切换、本地文件及桌面/手机布局；使用现有 Playwright 环境。
-- 题目 id、原分类标签、个人记录以及默认演示的复杂度分析继续对应原有行列标记法；各扩展方案的复杂度在对照页单独说明。
-
-## 演示键盘规则
-
-全部演示统一支持 **← 上一步、→ 下一步**，播放控制旁固定显示操作说明。方向键复用现有按钮，自动播放时按键会按既有单步逻辑暂停；首尾不会越界。在输入框、下拉框、可编辑区域中编辑，或按住 Ctrl/Alt/Meta/Shift 时，不接管方向键。题目页与矩阵方案页可把按键传给当前嵌入演示，不影响笔记编辑。
-
-共享实现为 `dist/demo-keyboard.js`；运行 `python tools/build-demo-keyboard.py` 将它接入演示和宿主页，Hot 100 / 矩阵生成器也会自动执行此步。新建演示继续使用 `prev`、`next` 按钮 id，并运行该构建器。验收使用 `node tests/browser/keyboard-browser-check.cjs`，覆盖全题库方向键、边界、暂停、编辑保护与嵌套演示。
-
-矩阵三方案对照页默认只展示方案卡片、当前流程说明与播放器；原理、手动例子和 Python 语法合并为一个按需展开区域，三种算法及各自代码完整保留。
-
-## 连续切换题目
-
-题目详情页提供随页面正常滚动的切题栏：上一题、下一题、全部题目下拉选择及当前位置。前后顺序与题库列表一致；首题禁用上一题、末题禁用下一题。切换复用原有网址路由，每题笔记、掌握程度和待复习标记仍按原题目 id 保存，浏览器后退可返回上一道题。左右方向键继续用于演示步骤，不用于切题。独立演示仍保持原有入口。
-
-运行 `node tests/browser/problem-switcher-browser.cjs` 验收全部题目入口、边界、直接选择、记录隔离、浏览器前后退、键盘用途及桌面布局。
+- 89 道 Hot 100 题的教学实现与讲解参考 [doocs/leetcode](https://github.com/doocs/leetcode)，
+  按 **CC BY-SA 4.0** 使用，署名与许可全文见 `dist/problems/hot100-LICENSE.txt`，每题演示页底部保留来源链接。
+- 站点自身代码尚未单独声明开源许可。对外复用前请先补充 `LICENSE`（建议代码 MIT、
+  派生题目内容继续 CC BY-SA 4.0），并保留上述署名。

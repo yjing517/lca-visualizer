@@ -24,7 +24,7 @@ let count = 0;
 for (const p of all.filter((p) => p.demo.includes("hot100-"))) {
   const dir = path.dirname(path.join("dist", p.demo)),
     data = JSON.parse(fs.readFileSync(path.join(dir, "data.json"), "utf8")),
-    snippets = require("../../read-snippets.cjs")(
+    snippets = require("../../tools/read-snippets.cjs")(
       fs.readFileSync(path.join(dir, "app.js"), "utf8"),
     );
   assert.ok(data.cases.length >= 2);

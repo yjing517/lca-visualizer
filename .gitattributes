@@ -1,0 +1,12 @@
+# 统一换行符，避免 Windows 与 Linux 生成的检查结果不一致
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.tar.gz binary

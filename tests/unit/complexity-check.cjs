@@ -49,7 +49,7 @@ for (const n of [45, 53, 152]) {
     profiles["leetcode-" + n].space.worst.bound,
     /Python Θ\(n\).*Java Θ\(1\)/,
   );
-  const snippets = require("../../read-snippets.cjs")(
+  const snippets = require("../../tools/read-snippets.cjs")(
     fs.readFileSync("dist/problems/hot100-" + n + "/app.js", "utf8"),
   );
   assert.match(snippets.Python.join("\n"), /nums\[(?:1:|:-1)\]/);

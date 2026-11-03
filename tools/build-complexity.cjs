@@ -4,7 +4,7 @@ const vm = require("node:vm");
 const crypto = require("node:crypto");
 const assert = require("node:assert/strict");
 const profiles = require("./complexity-profiles.cjs");
-const readSnippets = require("../read-snippets.cjs");
+const readSnippets = require("./read-snippets.cjs");
 const root = path.resolve(__dirname, "..");
 const sandbox = { window: {} };
 vm.runInNewContext(

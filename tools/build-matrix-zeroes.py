@@ -7,6 +7,8 @@ import itertools
 import json
 import pathlib
 import sys
+import re
+import runpy
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / 'dist/problems/hot100-73'
@@ -176,6 +178,7 @@ def execute(key, a, trace=False):
 
 def build():
     template = (OUT/'index.html').read_text(encoding='utf8')
+    template = re.sub(r'<script src="[^"]*demo-keyboard\.js"></script>', '', template)
     # Do not copy the baseline's extension link back into every child demo.
     template = template.replace('<p class="matrix-extension"><a href="optimizations.html">扩展：对照三种优化方案 →</a></p>', '')
     for key,(py,java,mapping,title,meaning) in SPECS.items():
@@ -206,5 +209,6 @@ def build():
                 for key in SPECS: execute(key,a)
                 count+=1
     print(f'Matrix variants built; {count} exhaustive matrices per new solution passed.')
+    runpy.run_path(str(ROOT/'tools/build-demo-keyboard.py'), run_name='__main__')
 
 if __name__ == '__main__': build()

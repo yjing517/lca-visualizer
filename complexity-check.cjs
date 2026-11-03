@@ -58,6 +58,12 @@ assert.match(profiles["leetcode-416"].space.best.bound, /Θ\(1\)/);
 assert.match(profiles["leetcode-437"].space.worst.why, /归零键/);
 assert.match(profiles["leetcode-215"].time.worst.bound, /n²/);
 assert.match(profiles["leetcode-394"].spaceLabel, /含结果/);
+for (const scenario of ["best", "worst"])
+  assert.equal(
+    profiles["leetcode-1143"].time[scenario].bound,
+    "Θ((n+1)(m+1))",
+    "empty strings retain initialization and outer-loop work",
+  );
 // Check key explanations against actual execution structure, not only schema presence.
 const robber = require("./dist/problems/robber/app.js");
 const calls = (values) =>

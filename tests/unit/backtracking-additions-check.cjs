@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict');const sum=require('./dist/problems/combination-sum3/app.js'),par=require('./dist/problems/parentheses/app.js');
+const assert=require('node:assert/strict');const sum=require('../../dist/problems/combination-sum3/app.js'),par=require('../../dist/problems/parentheses/app.js');
 const norm=a=>a.map(x=>Array.isArray(x)?[...x].sort((a,b)=>a-b).join(','):x).sort();
 for(let k=2;k<=9;k++)for(let n=1;n<=60;n++){
  const expected=[];for(let mask=0;mask<512;mask++){const a=Array.from({length:9},(_,i)=>i+1).filter(x=>mask>>(x-1)&1);if(a.length===k&&a.reduce((a,b)=>a+b,0)===n)expected.push(a);}

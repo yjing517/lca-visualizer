@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,snippets,highlightLines}=require('./dist/problems/subsets/app.js');
+const {trace,snippets,highlightLines}=require('../../dist/problems/subsets/app.js');
 for(const nums of [[],[0],[1,2],[1,2,3],[-1,2],Array.from({length:10},(_,i)=>i)]){
  const {events}=trace(nums),last=events.at(-1);
  assert.equal(last.ans.length,2**nums.length);assert.deepEqual(last.path,[]);assert.deepEqual(last.stack,[]);

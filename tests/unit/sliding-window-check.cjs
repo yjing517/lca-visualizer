@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,examples,snippets,highlightLines}=require('./dist/problems/sliding-window/app.js');
+const {trace,examples,snippets,highlightLines}=require('../../dist/problems/sliding-window/app.js');
 const brute=(a,k)=>a.slice(k-1).map((_,j)=>Math.max(...a.slice(j,j+k)));
 let seed=239;const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed;};
 for(const {nums,k} of [...examples,...Array.from({length:200},()=>{const nums=Array.from({length:1+rand()%20},()=>rand()%21-10);return {nums,k:1+rand()%nums.length};})]){

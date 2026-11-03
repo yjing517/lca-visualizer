@@ -3,12 +3,12 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const vm = require("node:vm");
 (async () => {
-  const server = require("./serve.cjs");
+  const server = require("../../serve.cjs");
   await new Promise((r) =>
     server.listening ? r() : server.once("listening", r),
   );
   const browser = await chromium.launch({
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    executablePath: process.env.CHROME_PATH || undefined,
     headless: true,
   });
   try {

@@ -5,12 +5,12 @@ const path = require("node:path");
 const vm = require("node:vm");
 const { pathToFileURL } = require("node:url");
 (async () => {
-  const server = require("./serve.cjs");
+  const server = require("../../serve.cjs");
   await new Promise((r) =>
     server.listening ? r() : server.once("listening", r),
   );
   const browser = await chromium.launch({
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    executablePath: process.env.CHROME_PATH || undefined,
     headless: true,
   });
   try {

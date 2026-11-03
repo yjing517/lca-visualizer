@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const { KEY, createStore, validateBackup } = require('./dist/records.js');
+const { KEY, createStore, validateBackup } = require('../../dist/records.js');
 let data = {};
 const storage = { getItem: k => data[k] || null, setItem: (k,v) => { data[k] = v; } };
 let store = createStore(storage);

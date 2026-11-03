@@ -1,4 +1,4 @@
-const assert=require('node:assert/strict');const {trace,snippets,highlightLines}=require('./dist/problems/lis/app.js');
+const assert=require('node:assert/strict');const {trace,snippets,highlightLines}=require('../../dist/problems/lis/app.js');
 function oracle(a,nonStrict){const f=a.map(()=>1);for(let i=0;i<a.length;i++)for(let j=0;j<i;j++)if(nonStrict?a[j]<=a[i]:a[j]<a[i])f[i]=Math.max(f[i],f[j]+1);return Math.max(0,...f);}
 for(let n=0;n<=7;n++)for(let seed=0;seed<80;seed++){
  const a=Array.from({length:n},(_,i)=>((seed>>(i%5))+i*seed)%7-3);

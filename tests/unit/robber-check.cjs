@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,snippets,highlightLines}=require('./dist/problems/robber/app.js');
+const {trace,snippets,highlightLines}=require('../../dist/problems/robber/app.js');
 function brute(a){let best=0;for(let mask=0;mask<1<<a.length;mask++){if(mask&(mask<<1))continue;let total=0;for(let i=0;i<a.length;i++)if(mask>>i&1)total+=a[i];best=Math.max(best,total);}return best;}
 for(let n=0;n<=6;n++)for(let seed=0;seed<20;seed++){
  const a=Array.from({length:n},(_,i)=>(seed*7+i*3)%11),d=trace(a);

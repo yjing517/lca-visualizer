@@ -3,9 +3,9 @@ const assert = require('node:assert/strict');
 const { pathToFileURL } = require('node:url');
 const path = require('node:path');
 (async () => {
-  const server = require('./serve.cjs');
+  const server = require('../../serve.cjs');
   await new Promise(r => server.listening ? r() : server.once('listening', r));
-  const browser = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+  const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, headless: true });
   try {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
     const errors = [];

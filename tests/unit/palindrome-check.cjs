@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,snippets,highlightLines}=require('./dist/problems/palindrome/app.js');
+const {trace,snippets,highlightLines}=require('../../dist/problems/palindrome/app.js');
 function brute(s){if(!s)return [[]];const out=[];for(let mask=0;mask<2**(s.length-1);mask++){const parts=[];let start=0;for(let i=0;i<s.length;i++)if(i===s.length-1||mask&(1<<i)){parts.push(s.slice(start,i+1));start=i+1;}if(parts.every(t=>t===[...t].reverse().join('')))out.push(parts);}return out;}
 for(let n=0;n<=5;n++)for(let mask=0;mask<2**n;mask++){
  const s=Array.from({length:n},(_,i)=>mask&(1<<i)?'a':'b').join(''),{events}=trace(s),end=events.at(-1);

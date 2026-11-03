@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const {trace,examples}=require('./dist/problems/bottom-left/app.js');
+const {trace,examples}=require('../../dist/problems/bottom-left/app.js');
 for(const [values,expected] of [...examples.map((v,i)=>[v,[1,7,42,9,3][i]]),[[0,-1,-1],-1],[[8,8,8,8,null,null,8],8]]) {
  const {events,nodes}=trace(values),last=events.at(-1);
  assert.equal(nodes[last.answer].val,expected);

@@ -2,3 +2,7 @@ node_modules/
 test-results/
 *.tar.gz
 __pycache__/
+
+# Local BMad setup and rendered machine-specific workflows
+_bmad/
+_bmad-output/

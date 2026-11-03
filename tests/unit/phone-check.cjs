@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,snippets,highlightLines}=require('./dist/problems/phone/app.js');
+const {trace,snippets,highlightLines}=require('../../dist/problems/phone/app.js');
 for(const [input,expected] of [['',[]],['2',['a','b','c']],['23',['ad','ae','af','bd','be','bf','cd','ce','cf']],['79',Array.from('pqrs',a=>Array.from('wxyz',b=>a+b)).flat()]]){
  const {events}=trace(input);
  assert.deepEqual(events.at(-1).ans,expected);assert.deepEqual(events.at(-1).stack,[]);

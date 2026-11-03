@@ -49,7 +49,7 @@ for (const n of [45, 53, 152]) {
     profiles["leetcode-" + n].space.worst.bound,
     /Python Θ\(n\).*Java Θ\(1\)/,
   );
-  const snippets = require("./read-snippets.cjs")(
+  const snippets = require("../../read-snippets.cjs")(
     fs.readFileSync("dist/problems/hot100-" + n + "/app.js", "utf8"),
   );
   assert.match(snippets.Python.join("\n"), /nums\[(?:1:|:-1)\]/);
@@ -65,7 +65,7 @@ for (const scenario of ["best", "worst"])
     "empty strings retain initialization and outer-loop work",
   );
 // Check key explanations against actual execution structure, not only schema presence.
-const robber = require("./dist/problems/robber/app.js");
+const robber = require("../../dist/problems/robber/app.js");
 const calls = (values) =>
   robber.trace(values).events.filter((e) => e.line === "check").length;
 for (let n = 2; n <= 7; n++)
@@ -79,7 +79,7 @@ for (let n = 3; n <= 7; n++)
     calls(Array(n).fill(0)),
     calls(Array(n - 1).fill(0)) + calls(Array(n - 2).fill(0)) + 1,
   );
-const palindrome = require("./dist/problems/palindrome/app.js");
+const palindrome = require("../../dist/problems/palindrome/app.js");
 for (let n = 1; n <= 6; n++) {
   const text = "abcabc".slice(0, n),
     events = palindrome.trace(text).events;

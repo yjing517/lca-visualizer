@@ -11,7 +11,7 @@ for(const problem of [...sandbox.window.PROBLEMS, ...variants]) {
  assert.ok(selector,`${problem.id}: 缺少语言选择器`);
  const options=[...selector[1].matchAll(/<option\b([^>]*)>([^<]*)<\/option>/g)].map(m=>m[1].match(/\bvalue="([^"]+)"/)?.[1]??m[2].trim());
  const scripts=[...html.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(m=>fs.readFileSync(path.join(path.dirname(demo),m[1]),'utf8')).join('\n');
- const snippets=require('./read-snippets.cjs')(scripts);
+ const snippets=require('../../read-snippets.cjs')(scripts);
  for(const lang of ['Python','Java']) {
   assert.ok(options.includes(lang),`${problem.id}: 缺少 ${lang} 选项`);
   assert.ok(Array.isArray(snippets[lang])&&snippets[lang].length>0,`${problem.id}: 缺少 ${lang} 实现`);

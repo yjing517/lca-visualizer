@@ -5,9 +5,9 @@ const fs = require('node:fs/promises');
 const { pathToFileURL } = require('node:url');
 const path = require('node:path');
 (async () => {
- const server = process.env.EXTERNAL_PREVIEW ? {listening:true,close(){}} : require('./serve.cjs');
+ const server = process.env.EXTERNAL_PREVIEW ? {listening:true,close(){}} : require('../../serve.cjs');
  await new Promise(resolve => server.listening ? resolve() : server.once('listening', resolve));
- const browser = await chromium.launch({ executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', headless: true });
+ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH || undefined, headless: true });
  try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
   const page = await context.newPage(); const errors = [];
@@ -135,7 +135,7 @@ const path = require('node:path');
   await page.goto(base + '#/problem/leetcode-513');
   await page.waitForFunction(() => document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const bfs=page.frameLocator('#demo');
-  const {trace:traceBfs,examples:bfsExamples,snippets,highlightLines}=require('./dist/problems/bottom-left/app.js');
+  const {trace:traceBfs,examples:bfsExamples,snippets,highlightLines}=require('../../dist/problems/bottom-left/app.js');
   const bfsEvents=traceBfs(bfsExamples[1]).events;
   for(let i=1;i<bfsEvents.length;i++) {
    await bfs.locator('#seek').evaluate((e,value)=>{e.value=value;e.dispatchEvent(new Event('input'));},i);
@@ -190,7 +190,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-17');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const phone=page.frameLocator('#demo');
-  const {trace:phoneTrace,snippets:phoneCode,highlightLines:phoneLines}=require('./dist/problems/phone/app.js');
+  const {trace:phoneTrace,snippets:phoneCode,highlightLines:phoneLines}=require('../../dist/problems/phone/app.js');
   await page.setViewportSize({width:1440,height:1000});
   const phoneEvents=phoneTrace('23').events;
   for(let i=0;i<phoneEvents.length;i++){
@@ -230,7 +230,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-78');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const subsets=page.frameLocator('#demo');
-  const {trace:subsetTrace,snippets:subsetCode,highlightLines:subsetLines}=require('./dist/problems/subsets/app.js');
+  const {trace:subsetTrace,snippets:subsetCode,highlightLines:subsetLines}=require('../../dist/problems/subsets/app.js');
   const subsetEvents=subsetTrace([1,2,3]).events;
   for(let i=0;i<subsetEvents.length;i++){
    await subsets.locator('#seek').evaluate((el,value)=>{el.value=value;el.dispatchEvent(new Event('input'));},i);
@@ -270,7 +270,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-77');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const combo=page.frameLocator('#demo');
-  const {trace:ct,snippets:cs,highlightLines:cl}=require('./dist/problems/combinations/app.js');
+  const {trace:ct,snippets:cs,highlightLines:cl}=require('../../dist/problems/combinations/app.js');
   for(let i=0;i<ct(4,2).events.length;i++){
    await combo.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
    const state=await combo.locator('#slots').textContent();
@@ -297,7 +297,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-46');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const perm=page.frameLocator('#demo');
-  const {trace:pt,snippets:ps,highlightLines:pl}=require('./dist/problems/permutations/app.js');
+  const {trace:pt,snippets:ps,highlightLines:pl}=require('../../dist/problems/permutations/app.js');
   const pe=pt([1,2,3]).events;
   for(let i=0;i<pe.length;i++){
    await perm.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
@@ -329,7 +329,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-131');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const pal=page.frameLocator('#demo');
-  const {trace:palTrace,snippets:palCode,highlightLines:palLines}=require('./dist/problems/palindrome/app.js');
+  const {trace:palTrace,snippets:palCode,highlightLines:palLines}=require('../../dist/problems/palindrome/app.js');
   const palEvents=palTrace('aab').events;
   for(let i=0;i<palEvents.length;i++){
    await pal.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);
@@ -368,7 +368,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-239');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const sw=page.frameLocator('#demo');
-  const {trace:swTrace,examples:swExamples,snippets:swCode,highlightLines:swLines}=require('./dist/problems/sliding-window/app.js');
+  const {trace:swTrace,examples:swExamples,snippets:swCode,highlightLines:swLines}=require('../../dist/problems/sliding-window/app.js');
   for(let example=0;example<swExamples.length;example++){
    await sw.locator('#example').selectOption(String(example));
    const expected=swTrace(swExamples[example].nums,swExamples[example].k).events;
@@ -429,7 +429,7 @@ const path = require('node:path');
   await page.goto(base+'#/problem/leetcode-1143');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   const lcs=page.frameLocator('#demo');
-  const {trace:lcsTrace,snippets:lcsCode,highlightLines:lcsLines}=require('./dist/problems/lcs/app.js');
+  const {trace:lcsTrace,snippets:lcsCode,highlightLines:lcsLines}=require('../../dist/problems/lcs/app.js');
   const lcsEvents=lcsTrace('abcde','ace').events;
   for(let i=0;i<lcsEvents.length;i++){
    await lcs.locator('#seek').evaluate((e,v)=>{e.value=v;e.dispatchEvent(new Event('input'));},i);

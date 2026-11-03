@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict');
-const {trace,snippets,highlightLines}=require('./dist/problems/combinations/app.js');
+const {trace,snippets,highlightLines}=require('../../dist/problems/combinations/app.js');
 for(let n=1;n<=8;n++)for(let k=1;k<=n;k++){
  const {events}=trace(n,k),last=events.at(-1);let count=1;for(let j=1;j<=k;j++)count=count*(n-j+1)/j;
  assert.equal(last.ans.length,Math.round(count));assert.equal(new Set(last.ans.map(a=>a.join(','))).size,last.ans.length);

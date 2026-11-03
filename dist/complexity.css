@@ -1,0 +1,236 @@
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.complexity-panel {
+  scroll-margin-top: 24px;
+}
+.complexity-panel:focus {
+  outline: 2px solid #9bb58d;
+  outline-offset: 4px;
+}
+.complexity-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.complexity-head h2 {
+  margin: 8px 0;
+}
+.complexity-badge {
+  font-size: 11px;
+  white-space: nowrap;
+  color: #5d7854;
+  background: #edf3e6;
+  border: 1px solid #d5e0cc;
+  border-radius: 20px;
+  padding: 6px 10px;
+}
+.complexity-algorithm {
+  color: #66785e;
+  font-size: 13px;
+}
+.complexity-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 18px 0;
+}
+.complexity-overview > div {
+  border: 1px solid #dce5d2;
+  border-radius: 9px;
+  background: #f5f8f0;
+  padding: 14px 16px;
+  min-width: 0;
+}
+.complexity-overview span {
+  display: block;
+  font-size: 11px;
+  color: #7a8872;
+  margin-bottom: 7px;
+}
+.complexity-overview strong {
+  font:
+    600 15px/1.8 Consolas,
+    "Microsoft YaHei",
+    monospace;
+  overflow-wrap: anywhere;
+}
+.complexity-panel summary {
+  cursor: pointer;
+  color: #32684b;
+  font-size: 13px;
+  padding: 8px 0;
+  line-height: 1.8;
+}
+.complexity-panel summary:focus-visible {
+  outline: 3px solid #82a96c;
+  outline-offset: 3px;
+}
+.complexity-parameters {
+  padding: 12px 15px;
+  background: #f4f6f0;
+  border-left: 3px solid #8ca779;
+  line-height: 1.9;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.complexity-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: 13px;
+  margin: 20px 0;
+}
+.complexity-table caption {
+  text-align: left;
+  color: #71816b;
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+.complexity-table th,
+.complexity-table td {
+  vertical-align: top;
+  text-align: left;
+  padding: 16px;
+  border-bottom: 1px solid #e0e7da;
+  overflow-wrap: anywhere;
+}
+.complexity-table thead th {
+  background: #edf3e6;
+  color: #55734b;
+  font-size: 12px;
+}
+.complexity-table thead th:first-child {
+  width: 17%;
+}
+.complexity-table tbody th {
+  color: #597351;
+  font-weight: 600;
+}
+.complexity-table td + td {
+  border-left: 1px solid #e5eadd;
+}
+.complexity-bound {
+  display: block;
+  color: #295b3e;
+  font:
+    600 15px/1.8 Consolas,
+    "Microsoft YaHei",
+    monospace;
+  overflow-wrap: anywhere;
+}
+.complexity-panel .complexity-when {
+  font-weight: 600;
+  margin: 10px 0 6px;
+  font-size: 12px;
+  color: #52664b;
+}
+.complexity-panel .complexity-why {
+  margin: 0;
+  color: #718168;
+  line-height: 1.9;
+  font-size: 12px;
+}
+.complexity-output {
+  background: #f1f5eb;
+  padding: 15px 18px;
+  border-radius: 8px;
+  margin: 18px 0;
+}
+.complexity-output h3 {
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.complexity-output p,
+.complexity-note,
+.complexity-notes {
+  font-size: 12px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+.complexity-guide {
+  border-top: 1px solid #dfe7d7;
+  margin-top: 18px;
+  padding-top: 8px;
+}
+.complexity-guide ul,
+.complexity-guide p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: #75816f;
+}
+.complexity-guide a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.complexity-notes li {
+  margin-bottom: 8px;
+}
+@media (max-width: 700px) {
+  .complexity-table caption {
+    display: block;
+    width: 100%;
+    white-space: normal;
+  }
+  .complexity-head {
+    align-items: flex-start;
+  }
+  .complexity-badge {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+  .complexity-overview {
+    grid-template-columns: 1fr;
+  }
+  .complexity-table,
+  .complexity-table tbody,
+  .complexity-table tr,
+  .complexity-table th,
+  .complexity-table td {
+    display: block;
+    width: 100%;
+  }
+  .complexity-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .complexity-table tr {
+    border: 1px solid #dce5d2;
+    border-radius: 9px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .complexity-table tbody th {
+    background: #edf3e6;
+    border-bottom: 0;
+  }
+  .complexity-table td + td {
+    border-left: 0;
+  }
+  .complexity-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: #8a987f;
+    font-size: 10px;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .complexity-table td:last-child {
+    border-bottom: 0;
+  }
+  .complexity-table th,
+  .complexity-table td {
+    padding: 13px 15px;
+  }
+  .detail-actions {
+    width: 100%;
+  }
+}

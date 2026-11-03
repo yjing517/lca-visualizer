@@ -41,3 +41,16 @@
 - 使用环境已提供的 Playwright 运行 `node browser-check.cjs` 和 `node hot100-browser-check.cjs`。后者逐题检查示例、前进回退、暂停重置、两种语言全步骤高亮、桌面/手机布局和新旧记录隔离。必要时通过 `NODE_PATH` 指向环境提供的模块，不提交机器路径或依赖副本。
 
 每次发布前，人工查看数组/窗口、矩阵/DP、树/递归、链表/缓存、图、堆、回溯等不同题型的截图；自动检查不能代替教学内容与代码对应关系的核对。题解和代码引用保留 doocs/leetcode 署名及 CC BY-SA 4.0 许可，见演示页底部。
+
+## 最好与最坏情况的复杂度分析
+
+每题详情在题意下方提供“复杂度分析”：默认显示最坏时间与空间摘要，展开后查看最好、最坏情形、触发条件及原因。页首“查看复杂度”按钮可用键盘打开并定位。输入规模、辅助空间、返回结果空间及语言差异分别说明；LRU、Trie、最小栈和数据流中位数还按公开操作拆分。
+
+分析以当前显示的代码为准，不按题型套模板。例如 198 是无缓存递归；53、45、152 的 Python 切片占线性空间；二分边界查找即使命中中点也不直接返回；437 中归零的前缀和键没有被删除。平均、均摊和严格单次最坏不能混写。对固定整数参数、输出数量和保守上界的限制，在各题中明确注明。
+
+- 编辑 `tools/complexity-profiles.cjs`，每题填写时间、空间各自的 `best`、`worst`，包括 `bound`、`when`、`why`，并解释结果存储。默认是辅助空间；确实使用总峰值的题目通过 `spaceLabel` 明示，避免重复计算结果。
+- 运行 `node tools/build-complexity.cjs` 生成 `dist/complexity-data.js`。详情页使用这一结构化分析；旧 `catalog.js` 的 `complexity` 字段仅作兼容保留，不再作为主要分析展示，Hot 100 生成器不会覆盖新模块。
+- `tools/complexity-code-lock.json` 绑定两种语言的代码摘要。解法改动后，先逐项复核分析，再用 `node tools/build-complexity.cjs --accept-reviewed-code` 记录已核对的代码。该选项只记录摘要，不会自动分析或保证复杂度正确。
+- `npm test` 包含完整性、生成数据一致性、代码摘要、安全转义及部分执行结构对照检查。它们不能代替人工推导。`npm run test:complexity-browser` 验证全部题目的展开、实际文字、操作表、桌面/手机布局、键盘定位、记录及播放进度保留和本地文件打开；使用与其他浏览器检查相同的 Playwright 环境。
+
+库细节核对参考 [CPython 3.10 排序](https://docs.python.org/3.10/howto/sorting.html)、[CPython 3.10.11 堆源码](https://github.com/python/cpython/blob/v3.10.11/Modules/_heapqmodule.c)、[OpenJDK 17 排序源码](https://github.com/openjdk/jdk17u/blob/master/src/java.base/share/classes/java/util/DualPivotQuicksort.java)、[Java 17 Arrays](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Arrays.html) 与 [Java 17 PriorityQueue](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/PriorityQueue.html)。库版本变化时须重新核对实现相关说明。

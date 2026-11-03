@@ -48,12 +48,20 @@
   function detail(p) {
     const saved = store.visit(p.id), r = store.get(p.id);
     if (!saved) notice(store.error);
-    $('content').innerHTML = `<div class="breadcrumb"><a href="#/library">全部题目</a> / ${esc(p.category)} / ${esc(p.number)}</div><div class="detailhead"><div><div class="eyebrow">PROBLEM ${esc(p.number)} · ${esc(p.difficulty)}</div><h1>${esc(p.title)}</h1>${tags(p)}</div><a class="button" href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原题 ↗</a></div>
+    $('content').innerHTML = `<div class="breadcrumb"><a href="#/library">全部题目</a> / ${esc(p.category)} / ${esc(p.number)}</div><div class="detailhead"><div><div class="eyebrow">PROBLEM ${esc(p.number)} · ${esc(p.difficulty)}</div><h1>${esc(p.title)}</h1>${tags(p)}</div><div class="detail-actions"><button id="jumpComplexity" type="button" ${window.Complexity ? '' : 'disabled'}>查看复杂度 ↓</button><a class="button" href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原题 ↗</a></div></div>
       <section class="panel"><h2>这道题在问什么？</h2><p>${esc(p.statement)}</p></section>
+      ${window.Complexity ? window.Complexity.render(p.id) : '<section class="panel"><h2>复杂度分析</h2><p>复杂度分析暂未能加载，请刷新后重试。题目、演示与笔记仍可使用。</p></section>'}
       <div class="demoheading"><h2>跟着代码，走一遍</h2><a href="${esc(p.demo)}" target="_blank" rel="noopener">独立打开演示 ↗</a></div><section class="demowrap"><div id="demoStatus" class="demo-status" role="status">正在准备交互演示…</div><iframe id="demo" title="${esc(p.title)} · 代码与执行过程" src="${esc(p.demo)}"></iframe></section>
-      <div class="twocol"><section class="panel"><h2>理解这几个关键点</h2>${p.principles.map((x, i) => `<article class="principle"><h3>${i + 1}. ${esc(x.title)}</h3><p>${esc(x.text)}</p></article>`).join('')}</section><section class="panel"><h2>容易卡住的地方</h2><ul>${p.pitfalls.map(x => `<li>${esc(x)}</li>`).join('')}</ul><h3 style="margin-top:24px">时间与空间</h3><p>${esc(p.complexity)}</p></section></div>
+      <div class="twocol"><section class="panel"><h2>理解这几个关键点</h2>${p.principles.map((x, i) => `<article class="principle"><h3>${i + 1}. ${esc(x.title)}</h3><p>${esc(x.text)}</p></article>`).join('')}</section><section class="panel"><h2>容易卡住的地方</h2><ul>${p.pitfalls.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section></div>
       <section class="panel"><h2>留给自己的复习笔记</h2><p>记录你这次卡住的原因，以及下次想提醒自己的事。</p><div class="notecontrols"><label class="field">掌握程度<select id="mastery">${statuses.map(s => `<option>${s}</option>`).join('')}</select></label><label class="checkbox"><input type="checkbox" id="review">标记待复习</label></div><label class="field" for="notes">我的理解与易错点</label><textarea id="notes" maxlength="100000" placeholder="例如：return 结束的是当前调用；left / right 是子树传回来的线索…"></textarea><div class="savenote" id="saveStatus" role="status" aria-live="polite"></div><p class="backuphelp">记录保存在当前浏览器，更新题库会保留。更换设备或浏览器前，请<a href="#/backup">导出备份</a>。</p></section>`;
     $('mastery').value = r.status; $('review').checked = r.review; $('notes').value = r.notes;
+    $('jumpComplexity').onclick = () => {
+      const panel = $('complexityPanel'), details = $('complexityDetails');
+      if (!panel || !details) return;
+      details.open = true;
+      panel.focus({ preventScroll: true });
+      panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    };
     function saveStatus(ok, initial) {
       $('saveStatus').classList.toggle('error', !ok);
       $('saveStatus').textContent = ok ? (initial ? (r.updatedAt ? '已载入保存的记录' : '修改后自动保存') : '✓ 已保存到此浏览器') : store.error;

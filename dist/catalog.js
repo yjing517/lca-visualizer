@@ -388,6 +388,42 @@ window.PROBLEMS = [{
     "col 的旧值可以覆盖，但三个占用标记必须在返回后撤销。"
   ],
   "complexity": "搜索保守上界 O(n·n!)，每个解的棋盘转换 O(n²)；辅助空间 O(n)，结果空间 O(S·n²)。"
+}, {
+  "id": "leetcode-494",
+  "number": "494",
+  "title": "目标和",
+  "difficulty": "中等",
+  "category": "动态规划",
+  "tags": [
+    "递归",
+    "动态规划"
+  ],
+  "addedAt": "2026-11-03",
+  "source": "https://leetcode.cn/problems/target-sum/",
+  "summary": "把正负号分配转为子集计数，跟随 (i,c) 的记忆化搜索，看懂为什么 0 也要计两次。",
+  "statement": "给定非负整数数组 nums 和整数 target，为每个数字添加 + 或 −。返回表达式结果等于 target 的不同符号分配数量。nums=[1,1,1,1,1]、target=3 时答案为 5；nums=[1]、target=1 时答案为 1。相同数字按不同下标分别选择，+0 与 −0 也属于不同符号分配。",
+  "demo": "problems/target-sum/index.html",
+  "principles": [
+    {
+      "title": "正号部分的和",
+      "text": "设总和为 S，正号部分的和为 p，则 p−(S−p)=target，所以 p=(S+target)/2。数出和为 p 的下标子集，就得到了符号分配数。"
+    },
+    {
+      "title": "dfs(i,c) 数的是选法",
+      "text": "只从下标 0 到 i 中选择，恰好凑出 c 的选法数。不选与选是两类互斥方案，返回值相加；当前数字超过 c 时只能不选。"
+    },
+    {
+      "title": "0 与缓存",
+      "text": "0 可以选也可以不选。虽然两条分支会访问相同的缓存状态，返回值仍要加两遍；不能在 c=0 时提前终止，因为还可能有未处理的 0。"
+    }
+  ],
+  "pitfalls": [
+    "S+target 为负数或奇数时直接返回 0；负 target 本身不代表无解。",
+    "基例必须是 i<0，再判断 c==0：成功返回 1，不是返回 0，也不是只返回 true。",
+    "这是计数问题，两条分支相加，不取 max，不把相同数字或同一个缓存返回值去重。",
+    "代码按截图先做负数与奇偶检查；p>S 时没有额外提前返回，会递归得到 0。"
+  ],
+  "complexity": "预检查求和 Θ(n)。进入记忆化后，时间与缓存空间上界 O(n(p+1))，递归栈 O(n)，p=(sum(nums)+target)/2；不是关于输入位数的强多项式时间。"
 }];
 
 // BEGIN GENERATED HOT100 — regenerate with python tools/build-hot100.py

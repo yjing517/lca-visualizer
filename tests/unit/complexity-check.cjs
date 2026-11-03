@@ -106,5 +106,5 @@ assert.ok(
   context.window.Complexity.render("not-collected").includes("暂未补充"),
 );
 console.log(
-  "Passed: 103 complete analyses, operation breakdowns, language-specific allocation notes, uncached recurrence, palindrome copy work and escaped rendering.",
+  "Passed: all catalog analyses, operation breakdowns, language-specific allocation notes, uncached recurrence, palindrome copy work and escaped rendering.",
 );

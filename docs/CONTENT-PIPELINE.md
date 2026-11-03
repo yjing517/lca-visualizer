@@ -32,7 +32,7 @@
 ## 3. Hot 100 生成链路
 
 当前采用力扣中文站 `top-100-liked` 学习计划，清单快照为 `tools/hot100.json`。
-100 题全部覆盖；题库另保留 513、77、216，共 103 题。Hot 100 标签只用于搜索，不改变已有分类与记录。
+100 题全部覆盖；题库另收录 513、77、216、494，共 104 题。Hot 100 标签只用于搜索，不改变已有分类与记录。
 
 89 道新增题使用独立入口 `dist/problems/hot100-<题号>/`，共享播放界面：
 
@@ -141,3 +141,12 @@ python tools/build-hot100.py
 - 每次发布前人工查看数组/窗口、矩阵/DP、树/递归、链表/缓存、图、堆、回溯等题型的截图；
   自动检查不能代替教学内容与代码对应关系的核对。
 - 题解与代码引用保留 doocs/leetcode 署名及 CC BY-SA 4.0 许可，见演示页底部。
+
+## 10. 目标和（494）
+
+手工题库条目使用稳定 ID `leetcode-494`。解法按用户截图，以 `p=(sum(nums)+target)/2` 转成 0–1 子集计数，再对 `(i,c)` 做记忆化；0 的选与不选必须分别计数，不能在 c=0 时提前返回。
+
+- 代码来源与轨迹生成器：`tools/build-target-sum.py`。`sys.settrace` 跟踪展示的 Python 函数真实执行；缓存包装器调用真实 `functools.cache` 并记录命中，捕获调用栈、返回值与缓存快照。
+- 人工核对的双语言映射及摘要：`tools/target-sum-line-maps.json`。修改代码前后都要复核相应行，不自动猜测映射。
+- 运行 `python tools/build-target-sum.py` 生成 `app.js`（双语言代码）、`data.js`（离线回放）与 `tools/traces/target-sum.json`（校验数据，不发布）；`--check` 逐快照重放并检查文件一致性。页面与播放器在 `dist/problems/target-sum/index.html`、`player.js`、`style.css`。
+- 专项检查 `node tests/unit/target-sum-check.cjs` 实际执行两种语言，与独立正负号穷举比较，覆盖负目标、零、奇偶与容量边界；浏览器检查 `node tests/browser/target-sum-browser.cjs` 检查所有示例的全部双语言步骤、缓存、回退播放、键盘、记录与本地文件打开。两项均已登记聚合运行器。

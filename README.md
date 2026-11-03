@@ -2,7 +2,7 @@
 
 [![checks](https://github.com/yjing517/lca-visualizer/actions/workflows/checks.yml/badge.svg)](https://github.com/yjing517/lca-visualizer/actions/workflows/checks.yml)
 
-把「刷过的题」变成「真正理解的题」。这是一个纯静态的个人算法学习站：103 道 LeetCode 题目
+把「刷过的题」变成「真正理解的题」。这是一个纯静态的个人算法学习站：104 道 LeetCode 题目
 （覆盖 Hot 100 全部 100 题，另保留 513、77、216），每题都配有可单步回放的执行过程、
 Python 与 Java 两份等价实现、最好/最坏复杂度分析，以及保存在浏览器里的个人笔记。
 

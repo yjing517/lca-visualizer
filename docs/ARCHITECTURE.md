@@ -33,6 +33,7 @@ flowchart LR
 | 个人记录 | `dist/records.js` | `algorithm-notebook.v1` 读写、校验、备份合并 | 修改必须同步 `tests/unit/records-check.cjs`，升级需迁移 |
 | 复杂度面板 | `dist/complexity.js` + `dist/complexity-data.js` | 渲染结构化的最好/最坏分析 | 改 `tools/complexity-profiles.cjs` 后重新生成 |
 | 键盘控制 | `dist/demo-keyboard.js` | ←/→ 映射 `prev`/`next` 按钮，编辑区保护 | 由 `tools/build-demo-keyboard.py` 接入各页面 |
+| 目标和演示 | `dist/problems/target-sum/` | 独立计数演示、双语言代码和真实 Python 轨迹 | `tools/build-target-sum.py` 与目标和专用页面/播放器 |
 | 生成题演示 | `dist/problems/hot100-<题号>/` | 页面 + `app.js`（双语言代码）+ `data.js`（离线轨迹） | `tools/build-hot100.py` 生成 |
 | 共享播放器 | `dist/problems/hot100-player.js` | 按轨迹快照渲染代码高亮、调用栈、状态与结果 | 直接修改，89 题共用；改动需全量浏览器验收 |
 | 轨迹校验数据 | `tools/traces/` | 各题与矩阵方案的轨迹 JSON，仅构建和检查使用 | 由生成器写出；测试读取，不随站点发布 |

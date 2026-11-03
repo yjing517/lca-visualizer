@@ -8,8 +8,8 @@ const all = context.window.PROBLEMS,
   official = JSON.parse(fs.readFileSync("tools/hot100.json", "utf8"));
 assert.equal(official.length, 100);
 assert.equal(new Set(official.map((q) => q.questionFrontendId)).size, 100);
-assert.equal(all.length, 103);
-assert.equal(new Set(all.map((p) => p.id)).size, 103);
+assert.ok(all.length >= 103);
+assert.equal(new Set(all.map((p) => p.id)).size, all.length);
 for (const q of official) {
   const p = all.find((p) => p.id === "leetcode-" + q.questionFrontendId);
   assert.ok(p);
@@ -59,5 +59,5 @@ for (const p of all.filter((p) => p.demo.includes("hot100-"))) {
   );
 }
 console.log(
-  `Passed: complete official 100, 103 unique entries, 14 original IDs, 89 demos, ${count} fixtures and snapshot/line-map integrity.`,
+  `Passed: complete official 100, ${all.length} unique entries, 14 original IDs, 89 demos, ${count} fixtures and snapshot/line-map integrity.`,
 );

@@ -28,6 +28,7 @@ const GROUPS = {
     ['permutations-check.cjs', '全排列'],
     ['palindrome-check.cjs', '分割回文串'],
     ['robber-check.cjs', '打家劫舍'],
+    ['target-sum-check.cjs', '目标和真实轨迹与双语言'],
     ['sliding-window-check.cjs', '滑动窗口'],
     ['lcs-check.cjs', '最长公共子序列'],
     ['lis-check.cjs', '最长递增子序列'],
@@ -60,6 +61,7 @@ const GROUPS = {
     ['keyboard-browser-check.cjs', '键盘验收'],
     ['problem-switcher-browser.cjs', '切题栏验收'],
     ['robber-stages-browser.cjs', '打家劫舍四阶段验收'],
+    ['target-sum-browser.cjs', '目标和验收'],
   ].map(([file, label]) => ({
     name: `browser/${file}`,
     label,

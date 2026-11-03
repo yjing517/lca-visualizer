@@ -1,6 +1,20 @@
 // Each bound describes the code actually displayed, not a different textbook solution.
 const point = (bound, when, why) => ({ bound, when, why });
 module.exports = {
+  "leetcode-494": {
+    algorithm: "正号子集计数与 (i,c) 记忆化搜索",
+    parameters: "n：数字个数；S=sum(nums)；p=(S+target)/2，预检查通过后 p 为非负整数。",
+    time: {
+      best: point("Θ(n)", "S+target 为负数或奇数", "先完整求和，再提前返回 0，不创建递归缓存。"),
+      worst: point("O(n(p+1))", "通过预检查，访问多个容量状态", "每个 (i,c) 最多计算一次；最多 (n+1)(p+1) 个状态，各有至多两条转移。此处是上界，实际只缓存访问过的状态。")
+    },
+    space: {
+      best: point("Θ(1)", "预检查失败", "只需常数个局部值，不创建缓存或递归栈。"),
+      worst: point("O(n(p+1))", "进入记忆化搜索", "缓存至多 (n+1)(p+1) 个返回值，加上 O(n) 深的递归栈。Python @cache 与 Java Map 都按需保存状态。")
+    },
+    output: "Θ(1)：返回方案数，原题范围内至多 2^20，可用 Java int 表示。",
+    notes: ["p 是容量，不是输入位数，所以是伪多项式上界。前置求和始终需要 Θ(n) 时间。", "截图代码没有针对 p>S 的额外提前返回；不会把所有无解输入都算作常数时间。", "0 的选与不选是两个不同符号分配，命中同一状态后仍然相加。教学轨迹与 DOM 展示空间不计入算法辅助空间。"]
+  },
   "leetcode-236": {
     algorithm: "后序递归，遇到目标节点立即返回",
     parameters: "n：节点数；h：树高。比较的是节点身份。",

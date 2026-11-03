@@ -47,14 +47,22 @@
   }
   function detail(p) {
     const saved = store.visit(p.id), r = store.get(p.id);
+    const position = problems.indexOf(p);
     if (!saved) notice(store.error);
     $('content').innerHTML = `<div class="breadcrumb"><a href="#/library">全部题目</a> / ${esc(p.category)} / ${esc(p.number)}</div><div class="detailhead"><div><div class="eyebrow">PROBLEM ${esc(p.number)} · ${esc(p.difficulty)}</div><h1>${esc(p.title)}</h1>${tags(p)}</div><div class="detail-actions"><button id="jumpComplexity" type="button" ${window.Complexity ? '' : 'disabled'}>查看复杂度 ↓</button><a class="button" href="${esc(p.source)}" target="_blank" rel="noopener noreferrer">查看原题 ↗</a></div></div>
+      <div class="problem-switcher" role="navigation" aria-label="切换题目"><button type="button" id="problemPrev" ${position === 0 ? 'disabled' : ''}>上一题</button><label class="problem-picker" for="problemSelect"><span>切换题目</span><select id="problemSelect">${problems.map(item => `<option value="${esc(item.id)}" ${item.id === p.id ? 'selected' : ''}>${esc(item.number)}. ${esc(item.title)}</option>`).join('')}</select></label><span class="problem-position" aria-label="题库第 ${position + 1} 题，共 ${problems.length} 题">${position + 1} / ${problems.length}</span><button type="button" id="problemNext" ${position === problems.length - 1 ? 'disabled' : ''}>下一题</button></div>
       <section class="panel"><h2>这道题在问什么？</h2><p>${esc(p.statement)}</p></section>
       ${window.Complexity ? window.Complexity.render(p.id) : '<section class="panel"><h2>复杂度分析</h2><p>复杂度分析暂未能加载，请刷新后重试。题目、演示与笔记仍可使用。</p></section>'}
       <div class="demoheading"><h2>跟着代码，走一遍</h2><a href="${esc(p.demo)}" target="_blank" rel="noopener">独立打开演示 ↗</a></div><section class="demowrap"><div id="demoStatus" class="demo-status" role="status">正在准备交互演示…</div><iframe id="demo" title="${esc(p.title)} · 代码与执行过程" src="${esc(p.demo)}"></iframe></section>
       <div class="twocol"><section class="panel"><h2>理解这几个关键点</h2>${p.principles.map((x, i) => `<article class="principle"><h3>${i + 1}. ${esc(x.title)}</h3><p>${esc(x.text)}</p></article>`).join('')}</section><section class="panel"><h2>容易卡住的地方</h2><ul>${p.pitfalls.map(x => `<li>${esc(x)}</li>`).join('')}</ul></section></div>
       <section class="panel"><h2>留给自己的复习笔记</h2><p>记录你这次卡住的原因，以及下次想提醒自己的事。</p><div class="notecontrols"><label class="field">掌握程度<select id="mastery">${statuses.map(s => `<option>${s}</option>`).join('')}</select></label><label class="checkbox"><input type="checkbox" id="review">标记待复习</label></div><label class="field" for="notes">我的理解与易错点</label><textarea id="notes" maxlength="100000" placeholder="例如：return 结束的是当前调用；left / right 是子树传回来的线索…"></textarea><div class="savenote" id="saveStatus" role="status" aria-live="polite"></div><p class="backuphelp">记录保存在当前浏览器，更新题库会保留。更换设备或浏览器前，请<a href="#/backup">导出备份</a>。</p></section>`;
     $('mastery').value = r.status; $('review').checked = r.review; $('notes').value = r.notes;
+    $('problemSelect').onchange = () => {
+      const target = problems.find(item => item.id === $('problemSelect').value);
+      if (target) location.hash = href(target);
+    };
+    $('problemPrev').onclick = () => { if (position > 0) location.hash = href(problems[position - 1]); };
+    $('problemNext').onclick = () => { if (position + 1 < problems.length) location.hash = href(problems[position + 1]); };
     $('jumpComplexity').onclick = () => {
       const panel = $('complexityPanel'), details = $('complexityDetails');
       if (!panel || !details) return;

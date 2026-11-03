@@ -19,7 +19,7 @@ for key, (py, java, mapping, title, meaning) in b.SPECS.items():
     expected = {'Python':py.splitlines(),'Java':java.splitlines()}
     actual = json.JSONDecoder().raw_decode((b.OUT/key/'app.js').read_text(encoding='utf8')[len('const snippets='):])[0]
     assert expected == actual, (key,'stale code')
-    data = json.loads((b.OUT/key/'data.json').read_text(encoding='utf8'))
+    data = json.loads((ROOT/'tools/traces'/f'hot100-73-{key}.json').read_text(encoding='utf8'))
     assert (b.OUT/key/'data.js').read_text(encoding='utf8') == 'window.HOT100_DATA='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';\n'
     for c in data['cases']:
         result,events=b.execute(key,c['input']['matrix'],True)

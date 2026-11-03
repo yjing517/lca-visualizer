@@ -12,6 +12,7 @@ import runpy
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / 'dist/problems/hot100-73'
+TRACES = ROOT / 'tools/traces'
 
 COPY = '''from typing import List
 
@@ -191,7 +192,8 @@ def build():
             result,events=execute(key,a,True)
             data['cases'].append(dict(input={'matrix':a},expected=oracle(a),result=result,events=events,boundary=i>=2))
         text=json.dumps(data,ensure_ascii=False,separators=(',',':'))
-        (dest/'data.json').write_text(text,encoding='utf8')
+        TRACES.mkdir(parents=True, exist_ok=True)
+        (TRACES/f'hot100-73-{key}.json').write_text(text,encoding='utf8')
         (dest/'data.js').write_text('window.HOT100_DATA='+text+';\n',encoding='utf8')
         (dest/'app.js').write_text('const snippets='+json.dumps({'Python':py.splitlines(),'Java':java.splitlines()},ensure_ascii=False)+';\nwindow.HOT100_SNIPPETS=snippets;\n',encoding='utf8')
         page=template.replace('../bottom-left/','../../bottom-left/').replace('../hot100-','../../hot100-')

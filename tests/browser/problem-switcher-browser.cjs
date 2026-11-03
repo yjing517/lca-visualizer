@@ -72,11 +72,13 @@ const path = require('node:path');
       await page.waitForFunction(() => {
         const panel = document.getElementById('complexityPanel').getBoundingClientRect();
         const bar = document.querySelector('.problem-switcher').getBoundingClientRect();
-        return panel.top >= bar.bottom && panel.top < 160;
+        return panel.top >= 0 && panel.top < 80;
       });
       await page.locator('.demoheading').evaluate(el => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY));
       const box = await page.locator('.problem-switcher').boundingBox();
-      assert.ok(box.y >= 0 && box.y < 30, 'picker stays visible while reading the demo');
+      assert.ok(box.y + box.height < 0, 'picker scrolls out of view while reading the demo');
+      await page.evaluate(() => window.scrollTo(0, 0));
+      assert.ok((await page.locator('.problem-switcher').boundingBox()).y >= 0, 'picker returns at the top');
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
       await page.screenshot({ path: `test-results/problem-switcher-${width}.png` });
     }
@@ -85,6 +87,6 @@ const path = require('node:path');
     await page.goto(pathToFileURL(path.resolve('dist/index.html')).href + '#/problem/' + problems[0].id);
     await page.locator('#problemNext').click(); await wait(problems[1]);
     assert.deepEqual(errors, []);
-    console.log(`Passed: all ${problems.length} question choices, 14 original players on desktop, previous/next boundaries, isolated records, history, reload, step keys, sticky desktop and offline routing.`);
+    console.log(`Passed: all ${problems.length} question choices, 14 original players on desktop, previous/next boundaries, isolated records, history, reload, step keys, scrolling desktop and offline routing.`);
   } finally { await browser.close(); server.close(); }
 })().catch(e => { console.error(e); process.exit(1); });

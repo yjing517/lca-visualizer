@@ -29,10 +29,36 @@ assert.equal(failed.merge(validateBackup(backup)), false);
 assert.equal(failed.get('leetcode-236').notes, '仅内存');
 data = { [KEY]: '{broken' };
 const corrupt = createStore(storage);
+assert.equal(corrupt.corrupted, true);
+assert.equal(corrupt.canBackup, false);
+assert.equal(corrupt.rawSnapshot, '{broken');
+assert.throws(() => corrupt.backup(), /不可读/);
+assert.ok(corrupt.error.includes('原始数据'));
 assert.equal(corrupt.update('leetcode-236', { notes: '不可覆盖原数据' }), false);
 assert.equal(data[KEY], '{broken');
 assert.equal(corrupt.merge(validateBackup(backup)), true);
 assert.equal(corrupt.error, '');
+assert.equal(corrupt.corrupted, false);
+assert.equal(corrupt.canBackup, true);
+assert.equal(corrupt.rawSnapshot, '');
+assert.equal(corrupt.get('leetcode-236').status, '需复习');
+// 版本不支持与完全无法访问存储时，同样不能假装备份成功。
+data = { [KEY]: JSON.stringify({ version: 2, records: {}, lastVisited: null }) };
+const versioned = createStore(storage);
+assert.equal(versioned.corrupted, true);
+assert.equal(versioned.canBackup, false);
+assert.ok(versioned.rawSnapshot.includes('"version":2'));
+assert.throws(() => versioned.backup(), /不可读/);
+const unreadable = createStore({ getItem: () => { throw Error('blocked'); }, setItem: () => {} });
+assert.equal(unreadable.corrupted, false);
+assert.equal(unreadable.canBackup, false);
+assert.equal(unreadable.rawSnapshot, '');
+assert.ok(unreadable.error.includes('无法访问浏览器存储'));
+assert.throws(() => unreadable.backup(), /不可读/);
+// 全新浏览器（没有旧记录）仍允许导出，空备份是合法的。
+const fresh = createStore({ getItem: () => null, setItem: () => {} });
+assert.equal(fresh.canBackup, true);
+assert.deepEqual(fresh.backup().records, {});
 const catalog = vm.runInNewContext(fs.readFileSync('dist/catalog.js', 'utf8') + ';window.PROBLEMS', { window: {} });
 assert.equal(new Set(catalog.map(p => p.id)).size, catalog.length);
 for (const p of catalog) {
@@ -40,4 +66,4 @@ for (const p of catalog) {
   assert.ok(fs.existsSync('dist/' + p.demo));
   assert.ok(p.tags.length && p.principles.length && p.pitfalls.length);
 }
-console.log('Passed: persistence, export/import, validation, failed writes, corruption recovery and catalog checks.');
+console.log('Passed: persistence, export/import, validation, failed writes, corruption recovery, backup refusal and catalog checks.');

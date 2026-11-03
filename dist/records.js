@@ -18,16 +18,24 @@
     return validateRecords(data.records);
   }
   function createStore(storage) {
-    let state = { version: 1, records: {}, lastVisited: null }, error = '', blocked = false;
+    let state = { version: 1, records: {}, lastVisited: null }, error = '', blocked = false, corrupted = false, rawSnapshot = '';
     try {
       const raw = storage.getItem(KEY);
       if (raw) {
+        rawSnapshot = raw;
         const saved = JSON.parse(raw);
         if (saved.version !== 1) throw Error('版本不支持');
         state.records = validateRecords(saved.records);
         state.lastVisited = typeof saved.lastVisited === 'string' ? saved.lastVisited : null;
       }
-    } catch (_) { error = '无法读取浏览器记录。为保护原数据，已暂停自动保存；可先导出当前记录，或导入已知备份恢复。'; blocked = true; }
+    } catch (_) {
+      // 读不出来时不能假装记录为空：保留原始内容供恢复，并停用「正常备份」。
+      corrupted = rawSnapshot !== '';
+      blocked = true;
+      error = corrupted
+        ? '浏览器里的记录无法解析。为避免覆盖，已暂停自动保存；请先下载原始数据留档，或导入之前导出的备份恢复。'
+        : '无法访问浏览器存储。为避免覆盖，已暂停自动保存；请确认浏览器允许本地存储后刷新重试。';
+    }
     function persist() {
       if (blocked) return false;
       try { storage.setItem(KEY, JSON.stringify(state)); error = ''; return true; }
@@ -35,17 +43,21 @@
     }
     return {
       get error() { return error; }, get records() { return state.records; }, get lastVisited() { return state.lastVisited; },
+      get corrupted() { return corrupted; }, get rawSnapshot() { return rawSnapshot; }, get canBackup() { return !blocked; },
       get(id) { return state.records[id] || emptyRecord(); },
       update(id, patch) {
         state.records = { ...state.records, ...validateRecords({ [id]: { ...this.get(id), ...patch, updatedAt: new Date().toISOString() } }) };
         return persist();
       },
       visit(id) { state.lastVisited = id; return persist(); },
-      backup() { return { kind: 'algorithm-notebook-backup', version: 1, exportedAt: new Date().toISOString(), records: state.records }; },
+      backup() {
+        if (!this.canBackup) throw Error('当前浏览器记录不可读，已停止导出正常备份；请下载原始数据或导入已有备份');
+        return { kind: 'algorithm-notebook-backup', version: 1, exportedAt: new Date().toISOString(), records: state.records };
+      },
       merge(records) {
         const next = { ...state, records: { ...state.records, ...validateRecords(records) } };
         // 导入先完整写入成功，再替换内存；失败时保留原记录。
-        try { storage.setItem(KEY, JSON.stringify(next)); state = next; blocked = false; error = ''; return true; }
+        try { storage.setItem(KEY, JSON.stringify(next)); state = next; blocked = false; corrupted = false; rawSnapshot = ''; error = ''; return true; }
         catch (_) { error = '导入未保存：浏览器存储不可用，原记录已保留。'; return false; }
       }
     };

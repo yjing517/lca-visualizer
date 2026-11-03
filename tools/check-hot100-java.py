@@ -43,7 +43,7 @@ def lit(x, t):
 
 def check(dest):
     n = int(dest.name.split("-")[-1])
-    data = json.loads((dest / "data.json").read_text(encoding="utf8"))
+    data = json.loads((ROOT / "tools/traces" / f"hot100-{n}.json").read_text(encoding="utf8"))
     js = (dest / "app.js").read_text(encoding="utf8")
     snippets = json.loads(js[len("const snippets=") : js.index(";\nwindow")])
     java = "\n".join(snippets["Java"])

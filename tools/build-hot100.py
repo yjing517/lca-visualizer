@@ -9,6 +9,7 @@ import ast, collections, copy, html, inspect, json, math, pathlib, re, sys, runp
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 UP = ROOT / "tools/upstream"
+TRACES = ROOT / "tools/traces"
 TEACHING = runpy.run_path(str(ROOT / "tools/teaching-overrides.py"))
 IMPORTS = """from typing import List, Optional
 from collections import Counter, defaultdict, deque
@@ -623,7 +624,9 @@ def build():
             out = ROOT / "dist/problems" / f"hot100-{n}"
             out.mkdir(parents=True, exist_ok=True)
             view = json.loads((ROOT / "tools/hot100-views.json").read_text(encoding="utf8"))[str(n)]
-            (out / "data.json").write_text(
+            trace_file = TRACES / f"hot100-{n}.json"
+            trace_file.parent.mkdir(parents=True, exist_ok=True)
+            trace_file.write_text(
                 json.dumps(
                     {
                         "number": n,
@@ -802,7 +805,7 @@ def register(new, qs):
             page = page.replace('<div class="toolbar">', '<p class="matrix-extension"><a href="optimizations.html">扩展：对照三种优化方案 →</a></p><div class="toolbar">', 1)
         (out / "index.html").write_text(page, encoding="utf8")
         (out / "data.js").write_text(
-            "window.HOT100_DATA=" + (out / "data.json").read_text(encoding="utf8") + ";\n",
+            "window.HOT100_DATA=" + (TRACES / f"hot100-{n}.json").read_text(encoding="utf8") + ";\n",
             encoding="utf8",
         )
     p = ROOT / "dist/catalog.js"

@@ -58,6 +58,7 @@ const GROUPS = {
     ['matrix-zeroes-browser.cjs', '矩阵方案验收'],
     ['keyboard-browser-check.cjs', '键盘验收'],
     ['problem-switcher-browser.cjs', '切题栏验收'],
+    ['robber-stages-browser.cjs', '打家劫舍四阶段验收'],
   ].map(([file, label]) => ({
     name: `browser/${file}`,
     label,

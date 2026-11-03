@@ -35,7 +35,7 @@ flowchart LR
 | 键盘控制 | `dist/demo-keyboard.js` | ←/→ 映射 `prev`/`next` 按钮，编辑区保护 | 由 `tools/build-demo-keyboard.py` 接入各页面 |
 | 生成题演示 | `dist/problems/hot100-<题号>/` | 页面 + `app.js`（双语言代码）+ `data.js`（离线轨迹） | `tools/build-hot100.py` 生成 |
 | 共享播放器 | `dist/problems/hot100-player.js` | 按轨迹快照渲染代码高亮、调用栈、状态与结果 | 直接修改，89 题共用；改动需全量浏览器验收 |
-| 手写题演示 | `dist/problems/<目录>/` | 独立页面与演示脚本（14 道旧题） | 直接修改；后续计划迁移到共享播放器 |
+| 手写题演示 | `dist/problems/<目录>/` | 独立页面与演示脚本（14 道旧题；其中 robber 含四阶段 DP） | 直接修改；后续计划迁移到共享播放器 |
 
 ### 详情页请求流程
 

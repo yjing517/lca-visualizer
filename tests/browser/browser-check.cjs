@@ -11,6 +11,10 @@ const path = require('node:path');
  try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true });
   const page = await context.newPage(); const errors = [];
+  async function waitForPlayback(frame) {
+    const before = Number(await frame.locator('#seek').inputValue());
+    await page.waitForFunction(before => Number(document.getElementById('demo')?.contentDocument?.getElementById('seek')?.value) > before, before, { timeout: 10000 });
+  }
   page.on('pageerror', e => errors.push(e.message));
   const base = 'http://127.0.0.1:'+server.address().port+'/';
   assert.equal((await page.goto(base)).status(), 200);
@@ -60,7 +64,7 @@ const path = require('node:path');
   await demo.locator('#reset').click();
   await demo.locator('#speed').selectOption('350');
   await demo.locator('#play').click();
-  await page.waitForTimeout(800);
+  await waitForPlayback(demo);
   await demo.locator('#play').click();
   const counter = await demo.locator('#counter').textContent();
   assert.ok(!counter.startsWith('0 /'));
@@ -168,7 +172,7 @@ const path = require('node:path');
   }
   await bfs.locator('#example').selectOption('1');
   await bfs.locator('#speed').selectOption('350');await bfs.locator('#play').click();
-  await page.waitForTimeout(800);await bfs.locator('#play').click();
+  await waitForPlayback(bfs);await bfs.locator('#play').click();
   const paused=await bfs.locator('#counter').textContent();
   assert.ok(!paused.startsWith('0 /'));await page.waitForTimeout(450);
   assert.equal(await bfs.locator('#counter').textContent(),paused);
@@ -213,7 +217,7 @@ const path = require('node:path');
   await phone.locator('#next').click();const phoneState=await phone.locator('#slots').textContent();
   await phone.locator('#next').click();await phone.locator('#prev').click();assert.equal(await phone.locator('#slots').textContent(),phoneState);
   await phone.locator('#reset').click();await phone.locator('#speed').selectOption('350');await phone.locator('#play').click();
-  await page.waitForTimeout(800);await phone.locator('#play').click();
+  await waitForPlayback(phone);await phone.locator('#play').click();
   const phonePaused=await phone.locator('#counter').textContent();assert.ok(!phonePaused.startsWith('0 /'));
   await page.waitForTimeout(450);assert.equal(await phone.locator('#counter').textContent(),phonePaused);
   await page.locator('#notes').fill('固定格子覆盖，不需要 pop。');await page.reload();
@@ -253,7 +257,7 @@ const path = require('node:path');
   await subsets.locator('#next').click();const subsetState=await subsets.locator('#slots').textContent();
   await subsets.locator('#next').click();await subsets.locator('#prev').click();assert.equal(await subsets.locator('#slots').textContent(),subsetState);
   await subsets.locator('#reset').click();await subsets.locator('#speed').selectOption('350');await subsets.locator('#play').click();
-  await page.waitForTimeout(800);await subsets.locator('#play').click();const subsetPaused=await subsets.locator('#counter').textContent();
+  await waitForPlayback(subsets);await subsets.locator('#play').click();const subsetPaused=await subsets.locator('#counter').textContent();
   assert.ok(!subsetPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await subsets.locator('#counter').textContent(),subsetPaused);
   await page.locator('#notes').fill('copy 保存，pop 撤销，两次递归分别选与不选。');await page.reload();
   assert.equal(await page.locator('#notes').inputValue(),'copy 保存，pop 撤销，两次递归分别选与不选。');
@@ -288,7 +292,7 @@ const path = require('node:path');
   }
   await combo.locator('#reset').click();await combo.locator('#next').click();const cp=await combo.locator('#counter').textContent();
   await combo.locator('#next').click();await combo.locator('#prev').click();assert.equal(await combo.locator('#counter').textContent(),cp);
-  await combo.locator('#speed').selectOption('350');await combo.locator('#play').click();await page.waitForTimeout(800);await combo.locator('#play').click();
+  await combo.locator('#speed').selectOption('350');await combo.locator('#play').click();await waitForPlayback(combo);await combo.locator('#play').click();
   const pausedC=await combo.locator('#counter').textContent();assert.notEqual(pausedC,cp);await page.waitForTimeout(450);assert.equal(await combo.locator('#counter').textContent(),pausedC);
   await page.locator('#notes').fill('j 至少为 d。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'j 至少为 d。');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
@@ -318,7 +322,7 @@ const path = require('node:path');
   }
   await perm.locator('#reset').click();await perm.locator('#next').click();const pp=await perm.locator('#slots').textContent();
   await perm.locator('#next').click();await perm.locator('#prev').click();assert.equal(await perm.locator('#slots').textContent(),pp);
-  await perm.locator('#speed').selectOption('350');await perm.locator('#play').click();await page.waitForTimeout(800);await perm.locator('#play').click();
+  await perm.locator('#speed').selectOption('350');await perm.locator('#play').click();await waitForPlayback(perm);await perm.locator('#play').click();
   const pausedP=await perm.locator('#counter').textContent();assert.ok(!pausedP.startsWith('1 /'));await page.waitForTimeout(450);assert.equal(await perm.locator('#counter').textContent(),pausedP);
   await page.locator('#notes').fill('新集合不用恢复，固定格子覆盖，答案要复制。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'新集合不用恢复，固定格子覆盖，答案要复制。');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
@@ -351,7 +355,7 @@ const path = require('node:path');
   const palState=await pal.locator('#slots').textContent();await pal.locator('#next').click();await pal.locator('#prev').click();
   assert.equal(await pal.locator('#slots').textContent(),palState);
   await pal.locator('#reset').click();await pal.locator('#speed').selectOption('350');await pal.locator('#play').click();
-  await page.waitForTimeout(800);await pal.locator('#play').click();const palPaused=await pal.locator('#counter').textContent();
+  await waitForPlayback(pal);await pal.locator('#play').click();const palPaused=await pal.locator('#counter').textContent();
   assert.ok(!palPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await pal.locator('#counter').textContent(),palPaused);
   await page.locator('#notes').fill('下一段从 j+1 开始，非回文继续枚举，不是 break。');await page.reload();
   assert.equal(await page.locator('#notes').inputValue(),'下一段从 j+1 开始，非回文继续枚举，不是 break。');
@@ -390,7 +394,7 @@ const path = require('node:path');
   }
   await sw.locator('#example').selectOption('0');await sw.locator('#next').click();const swProgress=await sw.locator('#counter').textContent();
   await sw.locator('#next').click();await sw.locator('#prev').click();assert.equal(await sw.locator('#counter').textContent(),swProgress);
-  await sw.locator('#reset').click();await sw.locator('#speed').selectOption('350');await sw.locator('#play').click();await page.waitForTimeout(800);await sw.locator('#play').click();
+  await sw.locator('#reset').click();await sw.locator('#speed').selectOption('350');await sw.locator('#play').click();await waitForPlayback(sw);await sw.locator('#play').click();
   const swPaused=await sw.locator('#counter').textContent();assert.ok(!swPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await sw.locator('#counter').textContent(),swPaused);
   await sw.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});assert.equal(await sw.locator('#answers').textContent(),'ans = [3,3,5,5,6,7]');
   await page.locator('#notes').fill('存下标，队尾淘汰，队头过期。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'存下标，队尾淘汰，队头过期。');
@@ -417,7 +421,7 @@ const path = require('node:path');
    await rob.locator('#seek').evaluate(e=>{e.value=e.max;e.dispatchEvent(new Event('input'));});
    assert.equal(await rob.locator('#answers').textContent(),'最终答案：'+answer);
   }
-  await rob.locator('#example').selectOption('[1,2,3,1]');await rob.locator('#reset').click();await rob.locator('#speed').selectOption('350');await rob.locator('#play').click();await page.waitForTimeout(800);await rob.locator('#play').click();
+  await rob.locator('#example').selectOption('[1,2,3,1]');await rob.locator('#reset').click();await rob.locator('#speed').selectOption('350');await rob.locator('#play').click();await waitForPlayback(rob);await rob.locator('#play').click();
   const robPaused=await rob.locator('#counter').textContent();assert.ok(!robPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await rob.locator('#counter').textContent(),robPaused);
   await page.locator('#notes').fill('选 i 必须跳过 i-1');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'选 i 必须跳过 i-1');
   await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
@@ -452,7 +456,7 @@ const path = require('node:path');
   await lcs.locator('#next').click();const lcsState=await lcs.locator('#array').textContent();
   await lcs.locator('#next').click();await lcs.locator('#prev').click();assert.equal(await lcs.locator('#array').textContent(),lcsState);
   await lcs.locator('#reset').click();await lcs.locator('#speed').selectOption('350');await lcs.locator('#play').click();
-  await page.waitForTimeout(800);await lcs.locator('#play').click();const lcsPaused=await lcs.locator('#counter').textContent();assert.ok(!lcsPaused.startsWith('0 /'));
+  await waitForPlayback(lcs);await lcs.locator('#play').click();const lcsPaused=await lcs.locator('#counter').textContent();assert.ok(!lcsPaused.startsWith('0 /'));
   await page.waitForTimeout(450);assert.equal(await lcs.locator('#counter').textContent(),lcsPaused);
   await page.locator('#notes').fill('先保存旧上方到 tmp，再更新，最后 pre=tmp。');await page.reload();
   assert.equal(await page.locator('#notes').inputValue(),'先保存旧上方到 tmp，再更新，最后 pre=tmp。');
@@ -484,7 +488,7 @@ const path = require('node:path');
     }
    }
   }
-  await lis.locator('#mode').selectOption('strict');await lis.locator('#example').selectOption('[10,9,2,5,3,7,101,18]');await lis.locator('#speed').selectOption('350');await lis.locator('#play').click();await page.waitForTimeout(800);await lis.locator('#play').click();const lisPaused=await lis.locator('#counter').textContent();assert.ok(!lisPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await lis.locator('#counter').textContent(),lisPaused);
+  await lis.locator('#mode').selectOption('strict');await lis.locator('#example').selectOption('[10,9,2,5,3,7,101,18]');await lis.locator('#speed').selectOption('350');await lis.locator('#play').click();await waitForPlayback(lis);await lis.locator('#play').click();const lisPaused=await lis.locator('#counter').textContent();assert.ok(!lisPaused.startsWith('0 /'));await page.waitForTimeout(450);assert.equal(await lis.locator('#counter').textContent(),lisPaused);
   await page.locator('#notes').fill('严格递增找首个大于等于 x；前缀不一定是实际方案。');await page.reload();assert.equal(await page.locator('#notes').inputValue(),'严格递增找首个大于等于 x；前缀不一定是实际方案。');await page.waitForFunction(()=>document.querySelector('#demoStatus')?.textContent.includes('已就绪'));
   await lis.locator('#seek').evaluate(e=>{e.value=20;e.dispatchEvent(new Event('input'));});
   for(const width of [1440,390]){await page.setViewportSize({width,height:1000});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok(await lis.locator('body').evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await page.screenshot({path:'test-results/lis-'+width+'.png',fullPage:true});}

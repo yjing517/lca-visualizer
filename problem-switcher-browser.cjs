@@ -37,6 +37,21 @@ const path = require('node:path');
       assert.equal(await page.locator('#problemPrev').isDisabled(), i === 0);
       assert.equal(await page.locator('#problemNext').isDisabled(), i === problems.length - 1);
     }
+    // Verify the existing bespoke players under the desktop-only maintenance scope.
+    for (const number of [236, 513, 17, 78, 77, 46, 131, 198, 239, 1143, 300, 216, 22, 51]) {
+      await jump(problems.find(p => p.id === `leetcode-${number}`));
+      const frame = page.frameLocator('#demo');
+      await frame.locator('#counter').filter({ hasText: /\// }).waitFor();
+      await frame.locator('#reset').click();
+      await frame.locator('#speed').selectOption('350');
+      await frame.locator('#play').click();
+      await page.waitForFunction(() => Number(document.getElementById('demo')?.contentDocument?.getElementById('counter')?.textContent.split('/')[0]) > 0, undefined, { timeout: 5000 });
+      await frame.locator('#play').click();
+      const paused = await frame.locator('#counter').textContent();
+      assert.ok(Number(paused.split('/')[0]) > 0, `${number}: playback advances before pausing`);
+      await page.waitForTimeout(450);
+      assert.equal(await frame.locator('#counter').textContent(), paused, `${number}: pause remains stable`);
+    }
     const matrix = problems.find(p => p.id === 'leetcode-73');
     await jump(matrix);
     await page.frameLocator('#demo').locator('.keyboard-rule').waitFor();
@@ -51,8 +66,14 @@ const path = require('node:path');
     // Check our handler without invoking the select's native option navigation.
     await page.locator('#problemSelect').dispatchEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true });
     assert.equal(await page.frameLocator('#demo').locator('#seek').inputValue(), '1');
-    for (const width of [1440, 390]) {
+    for (const width of [1440]) {
       await page.setViewportSize({ width, height: 1000 });
+      await page.locator('#jumpComplexity').click();
+      await page.waitForFunction(() => {
+        const panel = document.getElementById('complexityPanel').getBoundingClientRect();
+        const bar = document.querySelector('.problem-switcher').getBoundingClientRect();
+        return panel.top >= bar.bottom && panel.top < 160;
+      });
       await page.locator('.demoheading').evaluate(el => window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY));
       const box = await page.locator('.problem-switcher').boundingBox();
       assert.ok(box.y >= 0 && box.y < 30, 'picker stays visible while reading the demo');
@@ -64,6 +85,6 @@ const path = require('node:path');
     await page.goto(pathToFileURL(path.resolve('dist/index.html')).href + '#/problem/' + problems[0].id);
     await page.locator('#problemNext').click(); await wait(problems[1]);
     assert.deepEqual(errors, []);
-    console.log(`Passed: all ${problems.length} question choices, previous/next boundaries, isolated notes/status/review, history, reload, step keys, sticky desktop/mobile and offline routing.`);
+    console.log(`Passed: all ${problems.length} question choices, 14 original players on desktop, previous/next boundaries, isolated records, history, reload, step keys, sticky desktop and offline routing.`);
   } finally { await browser.close(); server.close(); }
 })().catch(e => { console.error(e); process.exit(1); });

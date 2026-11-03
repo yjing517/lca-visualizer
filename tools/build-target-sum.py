@@ -122,7 +122,9 @@ def trace_case(nums, target, mapping):
             calls += 1
             emit(10, 'call', frame)
         elif event == 'line':
-            emit(frame.f_lineno - 1, 'line', frame)
+            # CPython versions emit different decorator/definition bookkeeping lines.
+            if frame.f_code.co_name != 'findTargetSumWays' or frame.f_lineno - 1 not in (9, 10):
+                emit(frame.f_lineno - 1, 'line', frame)
         elif event == 'return':
             if frame.f_code.co_name == 'dfs':
                 memo[f"{frame.f_locals['i']},{frame.f_locals['c']}"] = arg
